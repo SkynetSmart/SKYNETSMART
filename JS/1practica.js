@@ -79,28 +79,64 @@
     }
 //carrusel
 const carrusel = document.getElementById('publicidadInner');
-  const totalImagenes = carrusel.children.length;
-  let index = 0;
+const imagenesOriginales = carrusel.children;
+const totalOriginales = imagenesOriginales.length;
+let index = 0;
+let autoavance;
 
-  const moverCarrusel = () => {
+// 1. Clonar la primera imagen y añadirla al final
+const primeraClonada = imagenesOriginales[0].cloneNode(true);
+carrusel.appendChild(primeraClonada);
+
+const moverCarrusel = (conAnimacion = true) => {
+    // Si queremos un salto instantáneo, quitamos la transición
+    carrusel.style.transition = conAnimacion ? "transform 0.8s ease" : "none";
     carrusel.style.transform = `translateX(-${index * 600}px)`;
-  };
+};
 
-  // Flecha de la izquierda
-  document.getElementById('btnAnterior').addEventListener('click', () => {
-    index = (index - 1 + totalImagenes) % totalImagenes;
-    moverCarrusel();
-  });
+const siguiente = () => {
+    index++;
+    moverCarrusel(true);
 
-  // Flecha de la derecha
-  document.getElementById('btnSiguiente').addEventListener('click', () => {
-    index = (index + 1) % totalImagenes;
-    moverCarrusel();
-  });
+    // Si llegamos al clon (al final), saltamos al inicio real sin que se note
+    if (index === totalOriginales) {
+        setTimeout(() => {
+            index = 0;
+            moverCarrusel(false); // Salto instantáneo
+        }, 800); // 800ms es lo que dura tu transición CSS
+    }
+};
 
-  // Autoavance (opcional, puedes quitar esto si no quieres que avance solo)
-  setInterval(() => {
-    index = (index + 1) % totalImagenes;
-    moverCarrusel();
-  }, 3000);
- 
+const anterior = () => {
+    if (index === 0) {
+        // Si estamos al inicio y damos atrás, saltamos al clon primero
+        index = totalOriginales;
+        moverCarrusel(false);
+        // Y luego animamos hacia la última imagen real
+        setTimeout(() => {
+            index = totalOriginales - 1;
+            moverCarrusel(true);
+        }, 10);
+    } else {
+        index--;
+        moverCarrusel(true);
+    }
+};
+
+const iniciarTemporizador = () => {
+    clearInterval(autoavance);
+    autoavance = setInterval(siguiente, 3000);
+};
+
+// Eventos
+document.getElementById('btnSiguiente').addEventListener('click', () => {
+    siguiente();
+    iniciarTemporizador();
+});
+
+document.getElementById('btnAnterior').addEventListener('click', () => {
+    anterior();
+    iniciarTemporizador();
+});
+
+iniciarTemporizador();

@@ -257,13 +257,41 @@ img {
   background-color: white;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-.publicidad {
-  width: 600px;
-  height: 375px;
-  overflow: hidden;
-  position: relative;
+/* Este contenedor junta a los dos y los centra */
+.bloque-publicidad-inicio {
+    display: flex;
+    justify-content: flex-start; /* Centra las dos cosas en la pantalla */
+    align-items: flex-start;
+    gap: 40px;               /* Espacio entre el carrusel y el video */
+    margin-top: 10px;
+    width: 100%;
 }
 
+.publicidad {
+    width: 600px;
+    height: 375px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0; /* Evita que el carrusel se aplaste */
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+}
+
+.videopublicidad {
+    width: 380px !important;
+    height: 480px !important;
+    position: relative; /* YA NO ES FIXED, ahora se mueve con la página */
+    border-radius: 10px;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+    
+}
+
+.videopublicidad video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 .publicidad-inner {
   display: flex;
   height: 100%;
@@ -329,13 +357,13 @@ body > :not(.footer):last-child {
 
 .contenedor {
     width: 90%;
-    max-width: 200px; /* más pequeño que antes*/
+    max-width: 100px; /* más pequeño que antes*/
     margin: 10px 0; /* menos espacio arriba y abajo*/
 
     .card {
         background: white;
         box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.1); /* sombra más suave*/
-        border-radius: 5px;
+        border-radius: 6px;
         overflow: hidden;
 
         img {
@@ -374,3 +402,17 @@ body > :not(.footer):last-child {
 
         @media screen and (max-width: 500px ){
         }
+
+
+/* Ajuste de seguridad para que nada desaparezca */
+.publicidad, .videopublicidad {
+  flex-shrink: 0; 
+}
+
+/* Responsivo: Si la pantalla es pequeña (celular), pon el video abajo del carrusel */
+@media (max-width: 1000px) {
+  .seccion-inicio-skynet {
+    flex-direction: column;
+    align-items: center;
+  }
+}
