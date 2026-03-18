@@ -411,7 +411,7 @@ body > :not(.footer):last-child {
 
 /* Responsivo: Si la pantalla es pequeña (celular), pon el video abajo del carrusel */
 @media (max-width: 1000px) {
-  .seccion-inicio-skynet {
+  .bloque-publicidad-inicio {
     flex-direction: column;
     align-items: center;
   }

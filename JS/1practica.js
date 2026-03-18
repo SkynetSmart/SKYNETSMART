@@ -55,18 +55,25 @@
         seccion.style.display = coincidenciaEncontrada ? 'block' : 'none';
       });
     });
-
-    function mostrarSeccion(id) {
+/*OCULTA LAS SECCIONES Y PUBLICIDAD*/
+  function mostrarSeccion(id) {
       const secciones = document.querySelectorAll('.seccion-oculta');
 
-      // Oculta todas las secciones y sus productos
-      secciones.forEach(seccion => {
+    // 1. Ocultamos el bloque de publicidad y video (Laptops + TikTok)
+    const publicidadInicio = document.querySelector('.bloque-publicidad-inicio');
+    if (publicidadInicio) {
+    publicidadInicio.style.display = 'none';
+    }
+
+
+    // Oculta todas las secciones y sus productos
+    secciones.forEach(seccion => {
         seccion.style.display = 'none';
         const productos = seccion.querySelectorAll('.tarjeta');
         productos.forEach(producto => producto.style.display = 'none');
       });
 
-      // Muestra la sección y todos sus productos que seleccionaste
+    // Muestra la sección y todos sus productos que seleccionaste
       const mostrar = document.getElementById(id);
       if (mostrar) {
         mostrar.style.display = 'block';
@@ -74,9 +81,10 @@
         productos.forEach(producto => producto.style.display = 'block');
       }
 
-      // Limpia el buscador para evitar conflicto con la búsqueda
+    // Limpia el buscador para evitar conflicto con la búsqueda
       inputBuscar.value = '';
-    }
+  }
+
 //carrusel
 const carrusel = document.getElementById('publicidadInner');
 const imagenesOriginales = carrusel.children;
@@ -140,3 +148,22 @@ document.getElementById('btnAnterior').addEventListener('click', () => {
 });
 
 iniciarTemporizador();
+/*Al hacer click en el logo vuelve al inicio*/
+function irAlInicio() {
+    // 1. Buscamos el bloque de Laptops + Video
+    const publicidadInicio = document.querySelector('.bloque-publicidad-inicio');
+    
+    // 2. Lo volvemos a mostrar (porque mostrarSeccion lo había ocultado)
+    if (publicidadInicio) {
+        publicidadInicio.style.display = 'flex';
+    }
+
+    // 3. ESTA ES LA LÍNEA QUE PREGUNTAS: Apaga las otras secciones (PCs, Celulares, etc.)
+    const secciones = document.querySelectorAll('.seccion-oculta');
+    secciones.forEach(seccion => {
+        seccion.style.display = 'none';
+    });
+
+    // 4. Limpia el buscador para que no queden textos viejos
+    if (inputBuscar) inputBuscar.value = '';
+}
