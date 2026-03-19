@@ -359,7 +359,7 @@ body > :not(.footer):last-child {
 .bloque-publicidad-inicio {
     display: flex;
     flex-direction: row;      /* En laptop: uno al lado del otro */
-    justify-content: flex-start;  /* Centra el grupo en la pantalla */
+    justify-content: center;  /* Centra el grupo en la pantalla */
     align-items: center;      /* Alinea todo a la misma altura */
     gap: 20px;                /* Espacio real entre los 3 bloques */
     padding: 20px;
