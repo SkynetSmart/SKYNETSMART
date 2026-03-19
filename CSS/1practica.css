@@ -106,14 +106,23 @@ body {
 }
 
 .imagen-esquina {
-  position:absolute;
-  top: 0px;
-  left: 10px;
-  width: 250px;
+  position: absolute;
+  top: 2%;            /* En lugar de 0px, usamos % para que respete un margen visual */
+  left: 2%;           /* En lugar de 10px, se mueve según el ancho de la pantalla */
+  width: 15%;         /* El ancho ahora es proporcional a la pantalla (ejemplo: 15%) */
+  min-width: 120px;   /* Pero le ponemos un mínimo para que no se haga diminuta */
+  max-width: 250px;   /* Y un máximo para que no crezca demasiado en monitores 4K */
   height: auto;
-  margin: 0px;
-  padding:0px;
   z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .imagen-esquina {
+    width: 80px;      /* En celulares la dejamos fija y pequeñita */
+    top: 5px;
+    left: 5px;
+    /* Si estorba mucho, puedes poner: display: none; para ocultarla solo en móvil */
+  }
 }
 
 /* Estilo para las secciones ocultas */
