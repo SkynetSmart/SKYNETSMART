@@ -358,12 +358,15 @@ body > :not(.footer):last-child {
 /* 1. AGREGA ESTO: Es el que posiciona TODO el bloque a la derecha */
 .marcas-grid {
     position: absolute;
-    right: 50px;
+    left: 55%;
     top: 150px;       /* Ajusta este número para bajar o subir el bloque */
     display: flex;    /* Pone las columnas una al lado de otra */
     gap: 15px;        /* Espacio horizontal entre columnas */
     z-index: 100;
     transform: translateY(-5%);
+    display: flex;
+    gap: 12px;
+    z-index: 100;
 }
 
 /* 2. CAMBIA ESTO: Deja tu .columna-marcas solo con esto */
