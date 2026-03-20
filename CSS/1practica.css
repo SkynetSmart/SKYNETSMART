@@ -23,36 +23,6 @@ body {
   padding: 10px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* --- 2. FILA SUPERIOR (LOGO Y REDES) --- */
 .fila-superior {
     display: flex;
@@ -63,7 +33,7 @@ body {
 }
 
 .imagen-esquina {
-    width: 180px; /* Ajuste para que se vea bien en laptop */
+    width: 300px; /* Ajuste para que se vea bien en laptop */
     height: auto;
     transition: width 0.3s;
 }
@@ -117,51 +87,44 @@ body {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* --- 4. EL MENÚ DE CATEGORÍAS --- */
 .carrusel {
-    display: flex;
-    overflow-x: auto;
-    gap: 10px;
-    padding: 5px 0;
-    margin-top: 5px;
+  display: flex;
+  overflow-x: auto; /* Permite el scroll horizontal */
+  gap: 0px;
+  padding: 10px 5px;
+  scroll-behavior: smooth;
+  white-space: nowrap;
+  justify-content: flex-start;
+  
+  /* CAMBIO IMPORTANTE: Eliminamos el margin-top de 75px */
+  /* Ahora el carrusel se posiciona automáticamente debajo del buscador */
+  margin-top: 0; 
+  
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Escondemos la barra de scroll para que se vea limpio como antes */
 .carrusel::-webkit-scrollbar {
-    display: none; /* Escondemos la barra para que se vea limpio */
+  display: none;
 }
+
+.enlace {
+  flex: 0 0 auto;
+  text-decoration: none;
+  background-color: #0b0a0a;
+  color: rgb(247, 248, 247);
+  padding: 1px 50px;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: background-color 0.3s, color 0.3s;
+  border: 2px solid #20ba3a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 
 /* --- 5. MODO CELULAR (RESPONSIVO TOTAL) --- */
 @media (max-width: 768px) {
