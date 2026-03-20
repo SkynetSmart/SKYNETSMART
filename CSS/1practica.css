@@ -33,7 +33,7 @@ body {
 }
 
 .imagen-esquina {
-    width: 300px; /* Ajuste para que se vea bien en laptop */
+    width: 250px; /* Ajuste para que se vea bien en laptop */
     height: auto;
     transition: width 0.3s;
 }
@@ -58,14 +58,14 @@ body {
 .contenedor-buscador {
   width: 100%;
   display: flex;
-  justify-content: center; /* Centra el buscador horizontalmente */
+  justify-content: flex-start; /* Centra el buscador horizontalmente */
   padding: 0; 
 }
 
 #buscar {
   /* Quitamos position: fixed o márgenes negativos que causan el choque */
   position: relative; 
-  width: 40%;
+  width: 30%;
   min-width: 250px;
   max-width: 500px;
   height: 35px;
@@ -364,11 +364,13 @@ html, body {
   color: #fff;
   text-align: center;
   padding: 10px 16px;
+ article p {
+  font-size: 10px; /* Puedes ajustar este número a tu gusto */
+  margin: 5px 0;   /* Opcional: para que no estén tan separados entre sí */
 }
 
-.footer p {
-  margin: 6px 0;
 }
+
 
 /* Evita que el último elemento del contenido genere margen extra */
 body > :not(.footer):last-child {
