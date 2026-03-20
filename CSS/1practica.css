@@ -10,17 +10,48 @@ body {
 }
 /****************************************************************************************************************/
 /* --- 1. EL ENCABEZADO (CONTENEDOR PADRE) --- */
+
 .titulo {
-    position: sticky;
-    top: 0;
-    background-color: black;
-    z-index: 1000;
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: column; /* Apila las filas: 1.Logo/Redes, 2.Buscador, 3.Menú */
-    gap: 3px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column; /* Apila los elementos */
+  align-items: center;    /* Centra todo */
+  background-color: black;
+  
+  /* --- ESTA ES LA LÍNEA QUE MANDA --- */
+  gap: 5px;  /* <--- Cámbialo a 2px o 0px para que el buscador suba pegadito al logo */
+  
+  padding: 10px;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* --- 2. FILA SUPERIOR (LOGO Y REDES) --- */
 .fila-superior {
@@ -28,7 +59,7 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-bottom: 5px;
+    padding-bottom: 0;
 }
 
 .imagen-esquina {
@@ -54,28 +85,70 @@ body {
 }
 
 /* --- 3. FILA DEL BUSCADOR (TU DISEÑO ADAPTADO) --- */
-.barrasuperior {
-    width: 100%;
-    display: flex;
-    justify-content: center; /* Centra el buscador en su fila */
+.contenedor-buscador {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centra el buscador horizontalmente */
+  padding: 0; 
 }
 
 #buscar {
-    /* Mantenemos tu lógica de tamaños ajustables */
-    width: 40%;            
-    min-width: 200px;      
-    max-width: 600px;      
-    
-    /* Tu diseño visual original */
-    height: 35px;
-    border: 3px solid rgb(44, 184, 74);
-    border-radius: 8px;
-    padding: 0 10px;
-    font-size: 16px;
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    box-sizing: border-box; 
+  /* Quitamos position: fixed o márgenes negativos que causan el choque */
+  position: relative; 
+  width: 40%;
+  min-width: 250px;
+  max-width: 500px;
+  height: 35px;
+  border: 3px solid rgb(44, 184, 74);
+  border-radius: 8px;
+  padding: 0 10px;
+  background-color: white;
+  box-sizing: border-box;
 }
+
+/* --- PARA QUE EN CELULAR NO SE AMONTONE --- */
+@media (max-width: 768px) {
+  .fila-superior {
+    flex-direction: column; /* En móvil: Logo arriba, redes abajo */
+    gap: 10px;
+  }
+  #buscar {
+    width: 90%; /* El buscador se estira en el celular */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* --- 4. EL MENÚ DE CATEGORÍAS --- */
 .carrusel {
