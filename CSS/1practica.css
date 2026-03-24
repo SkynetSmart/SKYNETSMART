@@ -223,7 +223,7 @@ img {
     #monitores2, #electrica2, #electrica22, #electrica222, #electrica4, #electrica44, #electrica444,
      #electrica6, #electrica66, #electrica666, #electrica6666, #electrica8, #electrica88
     , #electrica888, #lector2, #base2, #cortapicos2, #rj2, #tp2, #tp22, #adaptadorblu2, #adaptadorblu22, #wifi2, #Tarjetared2,
-    #Router2, #soporte2, #soporte22, #Bateria2, #relog2, #cinta2, #cinta22, #cinta222, #lector22, #lector222, #prueba2  {
+    #Router2, #soporte2, #soporte22, #Bateria2, #relog2, #cinta2, #cinta22, #cinta222, #lector22, #lector222{
       display: none;
     }
     /**Tamano de las trajetas de productos**/
