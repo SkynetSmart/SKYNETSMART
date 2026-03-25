@@ -468,14 +468,17 @@ body > :not(.footer):last-child {
 .tarjeta.agotado::after {
     content: "AGOTADO";
     position: absolute;
-    top: 40%;
+    
+    /* EL CAMBIO ESTÁ AQUÍ */
+    top: 120px; /* Al usar píxeles (px) en lugar de %, siempre se quedará a esa distancia del techo de la tarjeta */
+    
     left: 50%;
     transform: translate(-50%, -50%) rotate(-15deg);
-    background-color: #e74c3c; /* Rojo llamativo */
+    background-color: #e74c3c; 
     color: white;
     font-size: 1.5rem;
     font-weight: 900;
-    font-family: 'Orbitron', sans-serif; /* Usando la fuente de tu proyecto */
+    font-family: 'Orbitron', sans-serif; 
     padding: 10px 20px;
     border: 3px solid white;
     border-radius: 8px;
