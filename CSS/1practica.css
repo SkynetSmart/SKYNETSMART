@@ -454,3 +454,32 @@ body > :not(.footer):last-child {
         justify-content: center;
     }
 }
+/* ---- ESTILOS PARA PRODUCTOS AGOTADOS ---- */
+
+.tarjeta.agotado {
+    position: relative;
+    opacity: 0.6; /* Hace que toda la tarjeta se vea un poco transparente/opaca */
+    pointer-events: none; /* Desactiva los clics (las imágenes ya no cambiarán al tocarlas) */
+    user-select: none; /* Evita que se seleccione el texto */
+    filter: grayscale(80%); /* (Opcional) Vuelve la imagen casi en blanco y negro */
+}
+
+/* Sello rojo flotante de AGOTADO */
+.tarjeta.agotado::after {
+    content: "AGOTADO";
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    background-color: #e74c3c; /* Rojo llamativo */
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-family: 'Orbitron', sans-serif; /* Usando la fuente de tu proyecto */
+    padding: 10px 20px;
+    border: 3px solid white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+    letter-spacing: 2px;
+}
