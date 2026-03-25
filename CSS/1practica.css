@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: "Orbitron", sans-serif;
+  font-family: "Oswald", sans-serif;
   background-color:rgba(249, 246, 246, 0.959);
   padding-top: 0px; /* Espacio para el header fijo */
   min-height: 100svh;      /* ocupa toda la pantalla, mejora en móviles */
@@ -261,11 +261,6 @@ img {
   }
   h3 {
       text-align: center;
-
-  }
-  summary {
-      text-align: center;
-      color:rgb(144, 36, 12);
 
   }
 }
