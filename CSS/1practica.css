@@ -350,11 +350,6 @@ img {
 .flecha.derecha {
   right: 10px;
 }
-.articulo{
-        background: lightblue;
-        padding-top: 10px; /* Espacio para el header fijo */
-}
-
 /* Layout base para que el footer se quede abajo sin tapar contenido */
 html, body {
   height: 100%;
@@ -366,7 +361,8 @@ html, body {
   background: #222;
   color: #fff;
   text-align: center;
-  padding: 10px 16px;
+  padding-top: 3px ; /* Espacio para el header fijo */
+  
 p{
   color: #fff;
   font-size: 10px;
