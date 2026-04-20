@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -97,5 +97,100 @@
     });
 </script>
 
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración - Skynet</title>
+    <style>
+        body { font-family: Arial; padding: 50px; background-color: #f4f4f4; }
+        .caja { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input, textarea, button { width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; }
+        textarea { height: 100px; resize: none; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="caja">
+    <h2>Subir Nuevo Producto</h2>
+    <input type="text" id="titulo" placeholder="Nombre del equipo">
+    <input type="text" id="precio" placeholder="Precio (Ej. 550)">
+    <textarea id="descripcion" placeholder="Descripción detallada"></textarea>
+    
+    <input type="url" id="linkImagen1" placeholder="Enlace de la Imagen Principal">
+    <input type="url" id="linkImagen2" placeholder="Enlace de la Imagen Secundaria">
+    
+    <button id="btnGuardar">Subir a la Base de Datos</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    // Eliminamos las herramientas de Storage porque ya no las necesitamos
+
+    // Tus credenciales intactas
+    const firebaseConfig = {
+        apiKey: "AIzaSyDawRJ_UEd60LCwxD3Lk-eZsmMffpjWXlg",
+        authDomain: "skynetsmart-a9521.firebaseapp.com",
+        projectId: "skynetsmart-a9521",
+        storageBucket: "skynetsmart-a9521.firebasestorage.app",
+        messagingSenderId: "601143108776",
+        appId: "1:601143108776:web:de56547394c4293e8e0e9d",
+        measurementId: "G-WRF55Q2CB5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('btnGuardar').addEventListener('click', async () => {
+        const inputTitulo = document.getElementById('titulo').value;
+        const inputPrecio = document.getElementById('precio').value;
+        const inputDescripcion = document.getElementById('descripcion').value; 
+        const inputLinkImagen1 = document.getElementById('linkImagen1').value;
+        const inputLinkImagen2 = document.getElementById('linkImagen2').value; // Atrapamos el link
+
+        // Verifica que AMBOS links existan
+if (!inputTitulo || !inputPrecio || !inputDescripcion || !inputLinkImagen1 || !inputLinkImagen2) {
+    alert("Completa todos los campos y pega ambos enlaces de imagen.");
+    return;
+}
+
+        const btn = document.getElementById('btnGuardar');
+        btn.innerText = "Guardando...";
+        btn.disabled = true;
+
+        try {
+            // Guardamos directamente en la base de datos de texto. ¡Rápido y sin Storage!
+            // Dentro del evento click del botón guardar:
+await addDoc(collection(db, "computadoras"), {
+    titulo: inputTitulo,
+    precio: inputPrecio.replace('$', ''), 
+    descripcion: inputDescripcion,
+    imagen: document.getElementById('linkImagen1').value,
+    imagen2: document.getElementById('linkImagen2').value // Guardamos la segunda
+});
+
+            alert("¡Producto guardado con éxito!");
+            
+            document.getElementById('titulo').value = '';
+            document.getElementById('precio').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('linkImagen').value = '';
+
+        } catch (error) {
+            console.error("Error al guardar: ", error);
+            alert("Error de conexión. Revisa la consola.");
+        } finally {
+            btn.innerText = "Subir a la Base de Datos";
+            btn.disabled = false;
+        }
+    });
+</script>
 </body>
 </html>

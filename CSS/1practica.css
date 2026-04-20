@@ -655,6 +655,25 @@ body > :not(.footer):last-child {
     }
 }
 
+/* Estilo para que las imágenes ocupen el mismo espacio */
+.contenedor-imagen-standard {
+    position: relative;
+    width: 100%;
+    height: 250px; /* Ajusta a la altura que prefieras */
+    overflow: hidden;
+}
+
+.contenedor-imagen-standard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Para que no se deformen */
+    cursor: pointer;
+}
+
+/* LA REGLA MAESTRA: Oculta la segunda imagen de CUALQUIER tarjeta por defecto */
+.contenedor-imagen-standard img:nth-child(2) {
+    display: none;
+}
 
 
 

@@ -34,30 +34,39 @@ async function cargarProductos() {
         const querySnapshot = await getDocs(collection(db, "computadoras"));
         
         querySnapshot.forEach((doc) => {
-            const producto = doc.data();
-            
-            // Recreamos TU diseño exacto de tarjeta inyectando los datos
-            // Recreamos TU diseño exacto de tarjeta inyectando todos los datos
-            const tarjeta = `
-             <div class="tarjeta celulares">
-             <div class="contenedor-imagen-standard">
-            <img src="${producto.imagen}" alt="${producto.titulo}">
-              </div>
-             <h3 class="titulocompu1">${producto.titulo}</h3>
-             <form action="">
-            <details> 
-              <summary>Mas informacion</summary>
-              <ul>
-                <li>${producto.descripcion}</li>
-              </ul>
-              <h1>PRECIO: $${producto.precio}</h1>
+    const producto = doc.data();
+    const id = doc.id; // ID único de Firebase
+
+    const tarjeta = `
+        <div class="tarjeta celulares">
+            <div class="contenedor-imagen-standard" id="cont_${id}">
+                <img src="${producto.imagen}" onclick="alternarFotos('${id}')">
+                <img src="${producto.imagen2 || producto.imagen}" onclick="alternarFotos('${id}')">
+            </div>
+            <h3 class="titulocompu1">${producto.titulo}</h3>
+            <details>
+                <summary>Más información</summary>
+                <p>${producto.descripcion}</p>
+                <h1>PRECIO: $${producto.precio}</h1>
             </details>
-                 </form>
-                </div>
-            `;
-            // Añadimos la tarjeta al contenedor
-            contenedor.innerHTML += tarjeta;
-        });
+        </div>
+    `;
+    contenedor.innerHTML += tarjeta;
+});
+
+// FUNCIÓN MAESTRA PARA CAMBIAR IMAGEN
+window.alternarFotos = function(id) {
+    const contenedor = document.getElementById(`cont_${id}`);
+    const imagenes = contenedor.querySelectorAll('img');
+    
+    if (imagenes[0].style.display !== 'none') {
+        imagenes[0].style.display = 'none';
+        imagenes[1].style.display = 'block';
+    } else {
+        imagenes[0].style.display = 'block';
+        imagenes[1].style.display = 'none';
+    }
+}
     } catch (error) {
         console.error("Error al leer de Firebase: ", error);
     }
