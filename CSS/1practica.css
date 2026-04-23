@@ -191,12 +191,15 @@ a{
 }
     
 .titulocompu1 {
-      font-size: 25px;
-      color: rgb(10, 10, 10);
-      margin-bottom: 10px;
       font-size: 14px;
-       text-shadow: 0 2px 2px rgba(79, 77, 77, 0.344)
-    }
+      color: rgb(10, 10, 10);
+      margin-bottom: 10px;      
+      text-shadow: 0 2px 2px rgba(79, 77, 77, 0.344);
+        height: 40px; /* <--- Reserva el mismo espacio para todos */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+}
 
 img {
       width: 800px;
@@ -257,6 +260,8 @@ img {
 }
 
 .tarjeta {
+    display: flex;
+    flex-direction: column;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 10px;
@@ -286,7 +291,8 @@ img {
 .tarjeta img {
   width: 100%;
   max-width: 250px;
-  height: auto;
+  height: 200px;
+  object-fit: contain  !important;
   object-fit: cover;
   display: block;
   border-radius: 5px;
@@ -509,19 +515,20 @@ body > :not(.footer):last-child {
 
 .tarjeta .contenedor-imagen-standard {
     width: 100%;
-    height: 220px; /* Mantén una altura estricta. 250px puede ser muy alto para 4 columnas */
+    height: 200px; /* Mantén una altura estricta. 250px puede ser muy alto para 4 columnas */
     display: flex;
     justify-content: center; 
     align-items: center;     
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     overflow: hidden; /* CRÍTICO: Actúa como una guillotina. Nada sale de esta caja */
 }
 
 .tarjeta .contenedor-imagen-standard img {
     max-width: 100%; /* El freno de emergencia. La imagen NUNCA será más ancha que su caja */
     max-height: 100%; /* La imagen NUNCA será más alta que su caja */
-    object-fit: contain; /* Ajusta la foto perfectamente sin estirarla ni deformarla */
-    cursor: pointer;
+    object-fit: contain !important; /* Ajusta la foto perfectamente sin estirarla ni deformarla */
+    display: block;
+     cursor: pointer; 
 }
 
 

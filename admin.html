@@ -1,140 +1,77 @@
-<!-- <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel de Administración - Skynet</title>
-    <style>
-        body { font-family: Arial; padding: 50px; background-color: #f4f4f4; }
-        .caja { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        input, button { width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
-        button:hover { background: #0056b3; }
-    </style>
-</head>
-<body>
-
-<div class="caja">
-    <h2>Subir Nuevo Producto</h2>
-    <input type="text" id="titulo" placeholder="Nombre del equipo">
-    <input type="text" id="precio" placeholder="Precio">
-    <textarea id="descripcion" placeholder="Descripción detallada del producto"></textarea>
-    <input type="file" id="imagen" accept="image/*">
-    <button id="btnGuardar">Subir a la Base de Datos</button>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    // NUEVO: Herramientas para subir imágenes a la Bodega (Storage)
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
-
-    // OJO: REEMPLAZA ESTO CON TUS CREDENCIALES EXACTAS
-    const firebaseConfig = {
-        apiKey: "AIzaSyDawRJ_UEd60LCwxD3Lk-eZsmMffpjWXlg",
-  authDomain: "skynetsmart-a9521.firebaseapp.com",
-  projectId: "skynetsmart-a9521",
-  storageBucket: "skynetsmart-a9521.firebasestorage.app",
-  messagingSenderId: "601143108776",
-  appId: "1:601143108776:web:de56547394c4293e8e0e9d",
-  measurementId: "G-WRF55Q2CB5"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app); // Encendemos la bodega de imágenes
-
-    // Programar el botón
-    document.getElementById('btnGuardar').addEventListener('click', async () => {
-        const inputTitulo = document.getElementById('titulo').value;
-        const inputPrecio = document.getElementById('precio').value;
-        const inputDescripcion = document.getElementById('descripcion').value; // Atrapamos descripción
-        const archivoImagen = document.getElementById('imagen').files[0]; // Atrapamos el archivo físico
-
-        // Validación de seguridad
-        if (!inputTitulo || !inputPrecio || !inputDescripcion || !archivoImagen) {
-            alert("Frena ahí. No puedes dejar campos vacíos ni olvidar la foto.");
-            return;
-        }
-
-        // Cambiamos el texto del botón para que el jefe sepa que está cargando
-        const btn = document.getElementById('btnGuardar');
-        btn.innerText = "Subiendo archivo pesado, espera...";
-        btn.disabled = true;
-
-        try {
-            // FASE 1: Enviar foto a Storage
-            const nombreArchivo = Date.now() + "_" + archivoImagen.name; // Evita que dos fotos se llamen igual
-            const imagenRef = ref(storage, 'productos/' + nombreArchivo);
-            await uploadBytes(imagenRef, archivoImagen);
-            
-            // FASE 2: Pedirle a Storage la URL directa de la foto
-            const urlDescarga = await getDownloadURL(imagenRef);
-
-            // FASE 3: Guardar el texto + la URL de la foto en Firestore
-            await addDoc(collection(db, "computadoras"), {
-                titulo: inputTitulo,
-                precio: inputPrecio.replace('$', ''), // Quitamos el signo de dólar por si el jefe lo pone
-                descripcion: inputDescripcion,
-                imagen: urlDescarga
-            });
-
-            alert("¡Producto completo guardado en la nube con éxito!");
-            
-            // Limpiar todo
-            document.getElementById('titulo').value = '';
-            document.getElementById('precio').value = '';
-            document.getElementById('descripcion').value = '';
-            document.getElementById('imagen').value = '';
-
-        } catch (error) {
-            console.error("Error al guardar: ", error);
-            alert("Hubo un error de conexión.");
-        } finally {
-            // Restaurar el botón
-            btn.innerText = "Subir a la Base de Datos";
-            btn.disabled = false;
-        }
-    });
-</script>
-
-</body>
-</html> -->
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Panel de Administración - Skynet</title>
+    <title>Panel de Administración - Skynet Smart</title>
     <style>
         body { font-family: Arial; padding: 50px; background-color: #f4f4f4; }
-        .caja { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        input, textarea, button { width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; }
+        .caja { background: white; padding: 20px; border-radius: 8px; max-width: 500px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        input, textarea, select, button { width: 100%; margin-bottom: 15px; padding: 10px; box-sizing: border-box; font-family: Arial; }
         textarea { height: 100px; resize: none; }
-        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
         button:hover { background: #0056b3; }
+        hr { border: 0; border-top: 2px dashed #ccc; margin: 30px 0; }
+        .etiqueta-foto { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 5px; display: block; }
     </style>
 </head>
 <body>
 
 <div class="caja">
-    <h2>Subir Nuevo Producto</h2>
-    <input type="text" id="titulo" placeholder="Nombre del equipo">
-    <input type="text" id="precio" placeholder="Precio (Ej. 550)">
-    <textarea id="descripcion" placeholder="Descripción detallada"></textarea>
+    <h2 style="text-align: center;">🚀 Subir Nuevo Producto</h2>
     
-    <input type="url" id="linkImagen1" placeholder="Enlace de la Imagen Principal">
-    <input type="url" id="linkImagen2" placeholder="Enlace de la Imagen Secundaria">
+    <label style="color: rgb(19, 18, 18); display: block; margin: 10px 0; font-weight: bold;">
+        <input type="checkbox" id="checkAgotado" style="width: auto;"> ¿Producto Agotado?
+    </label>
+
+    <input type="text" id="codigoInterno" placeholder="Código CAOS (Ej. 4357) - ¡Vital para sincronizar!">
+    <input type="text" id="idLimpio" placeholder="ID Web (Ej. teclado-genius-kb700) - Sin espacios">
+    
+    <input type="text" id="titulo" placeholder="Nombre del equipo (Ej. Lenovo IdeaPad)">
+    <input type="text" id="precio" placeholder="Precio (Ej. 550.00)">
+    <textarea id="descripcion" placeholder="Descripción detallada separada por guiones (-)"></textarea>
+    
+    <select id="categoriaPrincipal">
+        <option value="" disabled selected>Selecciona Categoría Principal...</option>
+        <option value="computadoras">Computadoras</option>
+        <option value="celulares">Celulares & Tablets</option>
+        <option value="componentes">Componentes de PC</option>
+        <option value="accesorios">Accesorios</option>
+        <option value="perifericos">Periféricos</option>
+        <option value="impresoras">Impresoras</option>
+        <option value="suministros">Suministros de Impresión</option>
+        <option value="proteccion">Protección Eléctrica</option>
+        <option value="servicios">Servicios</option>
+        <option value="software">Software</option>
+        <option value="redes">Redes</option>
+        <option value="varios">Varios</option>
+    </select>
+
+    <input type="text" id="subCategoria" placeholder="Escribe la subcategoría (Ej. Teclados)">
+    
+    <label class="etiqueta-foto">📸 Foto Principal (Máx 500KB):</label>
+    <input type="file" id="fotoProducto1" accept="image/*">
+    
+    <label class="etiqueta-foto">📸 Foto Secundaria (Efecto al pasar el mouse):</label>
+    <input type="file" id="fotoProducto2" accept="image/*">
     
     <button id="btnGuardar">Subir a la Base de Datos</button>
+
+    <hr>
+
+    <h3 style="text-align: center;">🔄 Sincronizar Stock (Excel CAOS)</h3>
+    <p style="font-size: 13px; color: #666; text-align: center;">Sube el Excel exportado de CAOS para actualizar stock y precios de forma automática.</p>
+    
+    <input type="file" id="inputExcel" accept=".xlsx, .xls">
+    <button id="btnSincronizar" style="background: #28a745;">Actualizar Inventario</button>
+    <p id="estadoSincro" style="font-weight: bold; text-align: center; margin-top: 10px;"></p>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    // Eliminamos las herramientas de Storage porque ya no las necesitamos
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Tus credenciales intactas
     const firebaseConfig = {
         apiKey: "AIzaSyDawRJ_UEd60LCwxD3Lk-eZsmMffpjWXlg",
         authDomain: "skynetsmart-a9521.firebaseapp.com",
@@ -148,48 +85,135 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // API Key de ImgBB
+    const IMGBB_API_KEY = "c9251d2bf8bf4ffe2fd08ef08389d587"; 
+
+    // --- FUNCIÓN PARA SUBIR FOTOS A IMGBB ---
+    async function subirAImgBB(archivo) {
+        if (!archivo) return null;
+        const formData = new FormData();
+        formData.append("image", archivo);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: "POST",
+            body: formData
+        });
+        const data = await res.json();
+        return data.success ? data.data.url : null;
+    }
+
+    // --- 1. GUARDAR PRODUCTO NUEVO ---
     document.getElementById('btnGuardar').addEventListener('click', async () => {
-        const inputTitulo = document.getElementById('titulo').value;
-        const inputPrecio = document.getElementById('precio').value;
-        const inputDescripcion = document.getElementById('descripcion').value; 
-        const inputLinkImagen1 = document.getElementById('linkImagen1').value;
-        const inputLinkImagen2 = document.getElementById('linkImagen2').value; // Atrapamos el link
-
-        // Verifica que AMBOS links existan
-if (!inputTitulo || !inputPrecio || !inputDescripcion || !inputLinkImagen1 || !inputLinkImagen2) {
-    alert("Completa todos los campos y pega ambos enlaces de imagen.");
-    return;
-}
-
         const btn = document.getElementById('btnGuardar');
-        btn.innerText = "Guardando...";
+        const esAgotado = document.getElementById('checkAgotado').checked;
+        const inputCodigo = document.getElementById('codigoInterno').value.trim();
+        const inputIdLimpio = document.getElementById('idLimpio').value.trim();
+        const inputTitulo = document.getElementById('titulo').value.trim();
+        const inputPrecio = document.getElementById('precio').value.trim();
+        const inputDescripcion = document.getElementById('descripcion').value.trim(); 
+        const inputCatPrincipal = document.getElementById('categoriaPrincipal').value;
+        const inputSubCategoria = document.getElementById('subCategoria').value.trim();
+        
+        const archivo1 = document.getElementById('fotoProducto1').files[0];
+        const archivo2 = document.getElementById('fotoProducto2').files[0];
+
+        // Validaciones
+        if (!inputCodigo || !inputIdLimpio || !inputTitulo || !inputPrecio || !archivo1 || !inputCatPrincipal) {
+            alert("⚠️ Por favor completa todos los campos de texto, elige una categoría y sube al menos la Foto Principal.");
+            return;
+        }
+
+        btn.innerText = "⏳ Subiendo fotos...";
         btn.disabled = true;
+        btn.style.background = "#6c757d";
 
         try {
-            // Guardamos directamente en la base de datos de texto. ¡Rápido y sin Storage!
-            // Dentro del evento click del botón guardar:
-await addDoc(collection(db, "computadoras"), {
-    titulo: inputTitulo,
-    precio: inputPrecio.replace('$', ''), 
-    descripcion: inputDescripcion,
-    imagen: document.getElementById('linkImagen1').value,
-    imagen2: document.getElementById('linkImagen2').value // Guardamos la segunda
-});
+            // Subimos las fotos a ImgBB
+            const link1 = await subirAImgBB(archivo1);
+            const link2 = await subirAImgBB(archivo2);
 
-            alert("¡Producto guardado con éxito!");
+            if (!link1) throw new Error("No se pudo subir la foto principal.");
+
+            btn.innerText = "⏳ Guardando en Base de Datos...";
+
+            // Guardamos en Firebase con setDoc para usar el ID Web (idLimpio)
+            await setDoc(doc(db, "productos", inputIdLimpio), { 
+                codigoInterno: inputCodigo,
+                titulo: inputTitulo,
+                precio: parseFloat(inputPrecio.replace('$', '')),
+                descripcion: inputDescripcion,
+                categoria: inputCatPrincipal,
+                subcategoria: inputSubCategoria,
+                imagen: link1,
+                imagen2: link2 || link1, // Si no hay foto 2, duplica la 1 para evitar errores visuales
+                agotado: esAgotado 
+            });
+
+            alert("✅ ¡Producto guardado con éxito!");
             
-            document.getElementById('titulo').value = '';
-            document.getElementById('precio').value = '';
-            document.getElementById('descripcion').value = '';
-            document.getElementById('linkImagen').value = '';
+            // Limpiar formulario completo
+            document.querySelectorAll('input[type="text"], textarea, input[type="file"]').forEach(el => el.value = '');
+            document.getElementById('checkAgotado').checked = false;
+            document.getElementById('categoriaPrincipal').value = '';
 
         } catch (error) {
-            console.error("Error al guardar: ", error);
-            alert("Error de conexión. Revisa la consola.");
+            console.error("Error: ", error);
+            alert("❌ Error: " + error.message);
         } finally {
             btn.innerText = "Subir a la Base de Datos";
             btn.disabled = false;
+            btn.style.background = "#007bff";
         }
+    });
+
+    // --- 2. SINCRONIZAR INVENTARIO DESDE CAOS (EXCEL) ---
+    document.getElementById('btnSincronizar').addEventListener('click', () => {
+        const file = document.getElementById('inputExcel').files[0];
+        if (!file) return alert("⚠️ Primero selecciona el archivo Excel exportado de CAOS.");
+
+        const reader = new FileReader();
+        const estadoText = document.getElementById('estadoSincro');
+        estadoText.innerText = "⏳ Analizando Excel, por favor espera...";
+        estadoText.style.color = "#007bff";
+
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const hoja = workbook.Sheets[workbook.SheetNames[0]];
+                const productosExcel = XLSX.utils.sheet_to_json(hoja);
+                
+                let actualizados = 0;
+
+                for (const item of productosExcel) {
+                    const codigoCAOS = String(item.Codigo); 
+                    const stock = parseFloat(item.Disponibilidad);
+                    const precioCAOS = parseFloat(item.PVP);
+
+                    const q = query(collection(db, "productos"), where("codigoInterno", "==", codigoCAOS));
+                    const snap = await getDocs(q);
+
+                    if (!snap.empty) {
+                        const productoActual = snap.docs[0].data();
+                        const nuevoPrecio = (isNaN(precioCAOS) || precioCAOS <= 0) ? productoActual.precio : precioCAOS;
+
+                        // Actualizar Firebase
+                        await updateDoc(snap.docs[0].ref, {
+                            agotado: stock <= 0,
+                            precio: nuevoPrecio
+                        });
+                        actualizados++;
+                    }
+                }
+                
+                estadoText.innerText = `✅ ¡Sincronización exitosa! ${actualizados} productos actualizados.`;
+                estadoText.style.color = "#28a745";
+            } catch (error) {
+                console.error("Error leyendo Excel:", error);
+                estadoText.innerText = "❌ Error al procesar el archivo Excel. Revisa la consola.";
+                estadoText.style.color = "#dc3545";
+            }
+        };
+        reader.readAsArrayBuffer(file);
     });
 </script>
 </body>
