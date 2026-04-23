@@ -14,7 +14,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// FUNCIÓN PARA CAMBIAR IMAGEN (Corregida para que coincida con tus tarjetas)
+// FUNCIÓN PARA CAMBIAR IMAGEN
 window.alternarFotos = function(id) {
     const img1 = document.getElementById(`img1_${id}`);
     const img2 = document.getElementById(`img2_${id}`);
@@ -32,7 +32,7 @@ window.alternarFotos = function(id) {
 
 async function cargarProductos(categoria, subcategoria = "todo") {
     
-    // --- 1. EL SEMÁFORO: Elegimos la caja correcta según la categoría ---
+    // --- 1. EL SEMÁFORO CORREGIDO ---
     let contenedor;
     if (categoria === "suministros") {
         contenedor = document.getElementById('galeriaSuministros');
@@ -43,22 +43,22 @@ async function cargarProductos(categoria, subcategoria = "todo") {
     } else if (categoria === "impresoras") {
         contenedor = document.getElementById('galeriaImpresoras');
     } else if (categoria === "software") {
-        contenedor = document.getElementById('galeriaVarios'); 
+        contenedor = document.getElementById('galeriaSoftware'); 
     } else if (categoria === "proteccion") {
         contenedor = document.getElementById('galeriaProteccion');
     } else if (categoria === "varios") {
         contenedor = document.getElementById('galeriaVarios'); 
     } else if (categoria === "redes") {
         contenedor = document.getElementById('galeriaRedes'); 
-    } else if (categoria === "redes") {
+    } else if (categoria === "servicios") { // <-- ¡CORREGIDO EL ERROR DE TIPO AQUÍ!
         contenedor = document.getElementById('galeriaServicios'); 
     } else if (categoria === "perifericos") {
         contenedor = document.getElementById('galeriaPerifericos'); 
     } else if (categoria === "componentes") {
-        contenedor = document.getElementById('galeriaComponentes'); // <-- LA ÚLTIMA RUTA
+        contenedor = document.getElementById('galeriaComponentes'); 
     }
 
-    if (!contenedor) return; // Si no encuentra la caja, se detiene para no dar error
+    if (!contenedor) return; 
 
     contenedor.innerHTML = "<p> </p>"; 
 
@@ -83,8 +83,7 @@ async function cargarProductos(categoria, subcategoria = "todo") {
             listaProductos.push({ id: doc.id, ...doc.data() });
         });
 
-       // --- 3. MOTOR DE ORDENAMIENTO MULTI-CATEGORÍA ---
-
+       // --- 3. MOTOR DE ORDENAMIENTO ---
         function obtenerPrioridadFamilia(titulo) {
             const t = titulo.toLowerCase();
             if (t.includes("544")) return 10;
@@ -113,67 +112,30 @@ async function cargarProductos(categoria, subcategoria = "todo") {
         }
 
         listaProductos.sort((a, b) => {
-            
-            // 🛑 1. REGLAS PARA COMPONENTES (Orden de armado de PC)
             if (categoria === "componentes") {
-                const ordenComponentes = {
-                    "mainboard": 1,
-                    "almacenamiento": 2, // Discos Duros
-                    "procesador": 3,
-                    "tarjetavideo": 4,
-                    "ram": 5,
-                    "case": 6,
-                    "fuente": 7,
-                    "refrigeracion": 8 // Ventiladores y coolers
-                };
-                
+                const ordenComponentes = { "mainboard": 1, "almacenamiento": 2, "procesador": 3, "tarjetavideo": 4, "ram": 5, "case": 6, "fuente": 7, "refrigeracion": 8 };
                 const prioA = ordenComponentes[a.subcategoria] || 99;
                 const prioB = ordenComponentes[b.subcategoria] || 99;
-
-                if (prioA !== prioB) {
-                    return prioA - prioB; 
-                }
+                if (prioA !== prioB) return prioA - prioB; 
                 return a.titulo.localeCompare(b.titulo); 
             }
-
-            // 🛑 2. REGLAS PARA PERIFÉRICOS (Orden de tus botones)
             else if (categoria === "perifericos") {
-                const ordenPerifericos = {
-                    "monitores": 1,
-                    "teclados": 2,
-                    "mouses": 3,
-                    "camaras": 4,
-                    "audio-domotica": 5, // Audio y Alexa
-                    "almacenamiento-extra": 6, // Memorias y SD
-                    "accesorios-varios": 7 // Micrófonos y Laser
-                };
-                
+                const ordenPerifericos = { "monitores": 1, "teclados": 2, "mouses": 3, "camaras": 4, "audio-domotica": 5, "almacenamiento-extra": 6, "accesorios-varios": 7 };
                 const prioA = ordenPerifericos[a.subcategoria] || 99;
                 const prioB = ordenPerifericos[b.subcategoria] || 99;
-
-                if (prioA !== prioB) {
-                    return prioA - prioB; 
-                }
+                if (prioA !== prioB) return prioA - prioB; 
                 return a.titulo.localeCompare(b.titulo); 
             }
-
-            // 🛑 3. REGLAS PARA SUMINISTROS (La lógica original de las tintas)
             else if (categoria === "suministros") {
                 const prioFamiliaA = obtenerPrioridadFamilia(a.titulo);
                 const prioFamiliaB = obtenerPrioridadFamilia(b.titulo);
-
-                if (prioFamiliaA !== prioFamiliaB) {
-                    return prioFamiliaA - prioFamiliaB; 
-                }
+                if (prioFamiliaA !== prioFamiliaB) return prioFamiliaA - prioFamiliaB; 
                 return obtenerPrioridadColor(a.titulo) - obtenerPrioridadColor(b.titulo);
             }
-
-            // 🛑 4. REGLA POR DEFECTO PARA EL RESTO (Celulares, Redes, Accesorios...)
             else {
-                return a.titulo.localeCompare(b.titulo); // Orden alfabético
+                return a.titulo.localeCompare(b.titulo); 
             }
         });
-        // ---------------------------------------------------
 
         contenedor.innerHTML = ""; 
 
@@ -210,7 +172,7 @@ async function cargarProductos(categoria, subcategoria = "todo") {
     }
 }
 
-// PROTECTOR DE CARGA: Espera a que el HTML exista antes de buscar los botones
+// PROTECTOR DE CARGA
 document.addEventListener('DOMContentLoaded', () => {
     
     // Carga inicial
@@ -225,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarProductos("redes", "todo"); 
     cargarProductos("perifericos", "todo");
     cargarProductos("componentes", "todo");
-    // Configuración de botones (con verificación para que no den error null)
+
     const botones = {
         'btnSubTodo': "todo",
         'btnSubTinta': "Tinta",
@@ -234,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'btnSubMatricial': "Matricial"
     };
 
-    // --- CONFIGURACIÓN DE BOTONES PARA PERIFÉRICOS ---
    const botonesPerifericos = {
         'btnPeriTodo': "todo",
         'btnPeriMonitores': "monitores",
@@ -244,9 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
         'btnPeriAudio': "audio-domotica",
         'btnPeriMemorias': "almacenamiento-extra",
         'btnPeriVarios': "accesorios-varios"
-
-        
-        
     };
 
     const botonesComponentes = {
@@ -261,15 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
         'btnCompRefrigeracion': "refrigeracion"
     };
 
-    
-
-
+    // ACTIVADORES DE BOTONES SEGUROS
     Object.keys(botones).forEach(id => {
         const boton = document.getElementById(id);
         if (boton) {
             boton.addEventListener('click', () => {
                 cargarProductos("suministros", botones[id]);
-                
+                activarBotonMenu(boton);
             });
         }
     });
@@ -279,79 +235,95 @@ document.addEventListener('DOMContentLoaded', () => {
         if (boton) {
             boton.addEventListener('click', function() {
                 cargarProductos("componentes", botonesComponentes[id]);
-                // Reutilizamos la función de iluminar botones (asegúrate de que los botones tengan la clase que la función busca, o ajusta la función para que busque '.btn-pildora')
-                
-                // Pequeño truco para que ilumine las píldoras:
-                const botones = document.querySelectorAll('.btn-pildora');
-                botones.forEach(b => b.classList.remove('activo'));
+                const botonesPildora = document.querySelectorAll('.btn-pildora');
+                botonesPildora.forEach(b => b.classList.remove('activo'));
                 this.classList.add('activo');
             });
         }
     });
 
-   
-
-    
-
     Object.keys(botonesPerifericos).forEach(id => {
         const boton = document.getElementById(id);
         if (boton) {
             boton.addEventListener('click', function() {
-                // Le pide a Firebase que filtre por "perifericos" y por la subcategoría específica
                 cargarProductos("perifericos", botonesPerifericos[id]);
-                activarBotonMenu(this); // Prende el botón de verde
+                activarBotonMenu(this); 
             });
         }
     });
 
-    
-    // EJEMPLO DE CÓMO CONECTAR LOS BOTONES DE TU MENÚ
-
-// Carga inicial
-cargarProductos("suministros", "todo");
-
-// Botón VER TODO
-document.getElementById('btnSubTodo').addEventListener('click', function() {
-    cargarProductos("suministros", "todo");
-    activarBotonMenu(this); // 'this' significa "este botón que acabo de presionar"
+    // NOTA: Borramos las llamadas manuales repetidas que causaban el error de la pantalla blanca.
 });
 
-// Botón TINTA
-document.getElementById('btnSubTinta').addEventListener('click', function() {
-    cargarProductos("suministros", "Tinta"); 
-    activarBotonMenu(this);
-});
-
-// Botón LASER
-document.getElementById('btnSubLaser').addEventListener('click', function() {
-    cargarProductos("suministros", "Laser");
-    activarBotonMenu(this);
-});
-
-// Botón TÉRMICO
-document.getElementById('btnSubTermico').addEventListener('click', function() {
-    cargarProductos("suministros", "Termico");
-    activarBotonMenu(this);
-});
-
-// Botón MATRICIAL
-document.getElementById('btnSubMatricial').addEventListener('click', function() {
-    cargarProductos("suministros", "Matricial");
-    activarBotonMenu(this);
-});
-});
 // --- SISTEMA DE BOTONES ACTIVOS ---
-
 function activarBotonMenu(botonSeleccionado) {
-    // 1. Buscamos TODOS los botones que tengan la clase 'btn-suministro'
     const botones = document.querySelectorAll('.btn-suministro');
-    
-    // 2. Apagamos todos (les quitamos la clase 'activo')
     botones.forEach(boton => {
         boton.classList.remove('activo');
     });
-    
-    // 3. Encendemos SOLO el que el usuario presionó
     botonSeleccionado.classList.add('activo');
 }
 
+// =================================================================
+// 🚀 SOLUCIÓN BÚSQUEDA POR MARCAS EN BARRA PRINCIPAL
+// =================================================================
+window.filtrarPorMarca = function(marca) {
+    const buscador = document.getElementById('buscar'); // Tu barra de búsqueda
+    const pantallaInicio = document.getElementById('pantallaInicio'); // El contenedor de publicidad
+    
+    if (buscador) {
+        // 1. Escribimos la marca en el buscador automáticamente
+        buscador.value = marca;
+        
+        // 2. Ocultamos el fondo (publicidad y marcas) para no estorbar
+        if(pantallaInicio) {
+            pantallaInicio.style.display = 'none';
+        }
+        
+        // 3. Simulamos que el usuario escribió para activar 1practica.js
+        buscador.dispatchEvent(new Event('input', { bubbles: true }));
+        buscador.dispatchEvent(new Event('keyup', { bubbles: true }));
+        
+        // 4. Subimos la pantalla para ver los resultados
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+};
+
+// =================================================================
+// PARCHE AUTOMÁTICO: CONTROL DE LA PANTALLA DE INICIO
+// =================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const pantallaInicio = document.getElementById('pantallaInicio');
+    const barraBusqueda = document.getElementById('buscar'); 
+    const enlacesMenu = document.querySelectorAll('.enlace'); 
+    const logoInicio = document.querySelector('.imagen-esquina'); 
+    
+    if(!pantallaInicio) return;
+
+    // 1. Si escriben en el buscador, ocultamos el inicio para que no estorbe abajo
+    if(barraBusqueda) {
+        barraBusqueda.addEventListener('input', (e) => {
+            if(e.target.value.trim() !== "") {
+                pantallaInicio.style.display = 'none';
+            } else {
+                // Si borran todo el texto del buscador, vuelve a aparecer el inicio
+                pantallaInicio.style.display = 'block';
+            }
+        });
+    }
+
+    // 2. Si tocan cualquier categoría del menú de arriba (Computadoras, etc), ocultamos el inicio
+    enlacesMenu.forEach(enlace => {
+        enlace.addEventListener('click', () => {
+            pantallaInicio.style.display = 'none';
+        });
+    });
+
+    // 3. Si tocan el logo de Skynet para volver al Home, mostramos el inicio de nuevo
+    if(logoInicio) {
+        logoInicio.addEventListener('click', () => {
+            pantallaInicio.style.display = 'block';
+            if(barraBusqueda) barraBusqueda.value = ""; // Limpiamos la barra de búsqueda
+        });
+    }
+});

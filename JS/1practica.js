@@ -298,3 +298,4 @@ if (carruselPrincipal) {
         carruselPrincipal.scrollLeft += (e.deltaY * 0.4); 
     }, { passive: false });
 }
+
