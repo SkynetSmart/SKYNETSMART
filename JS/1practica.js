@@ -299,3 +299,241 @@ if (carruselPrincipal) {
     }, { passive: false });
 }
 
+// ==========================================
+// LÓGICA BÁSICA DEL CHATBOT
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const btnAbrirChat = document.getElementById('btn-abrir-chat');
+    const btnCerrarChat = document.getElementById('btn-cerrar-chat');
+    const ventanaChat = document.getElementById('skynet-chatbot');
+
+    if(btnAbrirChat && btnCerrarChat && ventanaChat) {
+        // Abrir chat
+btnAbrirChat.addEventListener('click', () => {
+    ventanaChat.style.display = 'flex';
+    btnAbrirChat.style.display = 'none'; // Oculta el botón redondo
+
+    // // Ocultar el menú de navegación (El carrusel)
+    // const menuNavegacion = document.querySelector('.carrusel'); 
+    // if (menuNavegacion) {
+    //     menuNavegacion.style.display = 'none'; 
+    // }
+});
+
+// Cerrar chat
+btnCerrarChat.addEventListener('click', () => {
+    ventanaChat.style.display = 'none';
+    btnAbrirChat.style.display = 'block'; // Muestra el botón redondo
+
+    // // Volver a mostrar el menú cuando se cierra el chat
+    // const menuNavegacion = document.querySelector('.carrusel');
+    // if (menuNavegacion) {
+    //     menuNavegacion.style.display = 'flex'; // Tu menú usa flexbox
+    // }
+});
+    }
+});
+
+// Función "fantasma" por ahora para que no de error al dar clic en las opciones
+// ==========================================
+// LÓGICA DEL MENÚ PRINCIPAL DEL CHATBOT
+// ==========================================
+
+function procesarOpcion(opcion) {
+    const areaMensajes = document.getElementById('chatbot-mensajes');
+    const areaOpciones = document.getElementById('chatbot-opciones');
+
+    // Opción 1: Catálogo
+    if (opcion === 'catalogo') {
+        areaMensajes.innerHTML += `
+            <div class="mensaje-bot">
+                <p>¡Perfecto! Puedes usar nuestra barra de búsqueda o hacer clic en los logos de las marcas arriba para filtrar los equipos y componentes que tenemos en stock.</p>
+            </div>
+        `;
+    } 
+    // Opción 2: Servicios (Usa tu propia función mostrarSeccion)
+    else if (opcion === 'servicios') {
+        areaMensajes.innerHTML += `
+            <div class="mensaje-bot">
+                <p>Contamos con 4 áreas de especialidad técnica. Te he llevado a nuestra sección de servicios. ¡Haz clic en el banner del servicio que necesites para detallar tu problema!</p>
+            </div>
+        `;
+        
+        // 1. Usamos tu función nativa para limpiar todo y mostrar solo los Servicios
+        if (typeof mostrarSeccion === 'function') {
+            mostrarSeccion('Servicios');
+        } else {
+            // Por si acaso la función falla, forzamos la aparición
+            document.getElementById('Servicios').classList.remove('seccion-oculta');
+            document.getElementById('Servicios').style.display = 'block';
+        }
+
+        // 2. Hacemos el scroll hacia los banners
+        setTimeout(() => {
+            const seccionServicios = document.getElementById('Servicios');
+            if(seccionServicios) {
+                seccionServicios.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 150);
+    }
+    // Opción 3: Información (Filtro automático de preguntas repetitivas)
+    else if (opcion === 'info') {
+        areaMensajes.innerHTML += `
+            <div class="mensaje-bot">
+                <p>📍 <strong>Ubicación:</strong> Manuel Vega 7-32, Cuenca.<br>
+                📦 <strong>Envíos:</strong> A nivel nacional por Servientrega.<br>
+                💳 <strong>Pagos:</strong> Efectivo, transferencias y tarjetas de crédito.</p>
+            </div>
+        `;
+    } 
+    // Opción 4: Hablar con asesor (Ruta de escape general)
+    else if (opcion === 'asesor') {
+        areaMensajes.innerHTML += `
+            <div class="mensaje-bot">
+                <p>Te comunicaré con nuestro equipo. Por favor, escribe tu consulta abajo para que el asesor pueda ayudarte más rápido:</p>
+            </div>
+        `;
+        // Cambiamos los botones por la caja de texto para WhatsApp
+        areaOpciones.innerHTML = `
+            <textarea id="input-general" placeholder="Escribe tu consulta aquí..." style="width: 100%; height: 60px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; resize: none; font-family: inherit; margin-bottom: 10px;"></textarea>
+            <button class="btn-opcion-chat" style="background-color: #00cc66; color: white; text-align: center; font-weight: bold;" onclick="enviarWhatsAppGeneral()">
+                Ir a WhatsApp
+            </button>
+            <button class="btn-opcion-chat" style="text-align: center; border-color: #ccc; color: #666;" onclick="volverAlMenuPrincipal()">
+                ← Volver al inicio
+            </button>
+        `;
+    }
+
+    // Asegurarnos de que el scroll del chat baje automáticamente para leer el nuevo mensaje
+    areaMensajes.scrollTop = areaMensajes.scrollHeight;
+}
+
+// Función exclusiva para el botón "Hablar con un asesor"
+function enviarWhatsAppGeneral() {
+    const inputGeneral = document.getElementById('input-general').value;
+    
+    if (inputGeneral.trim() === "") {
+        alert("Por favor, escribe un breve mensaje antes de ir a WhatsApp.");
+        return;
+    }
+
+    const numeroWhatsApp = "593988024097"; // Tu número de Skynet Smart
+    const mensajeFinal = `Hola Skynet Smart, tengo una consulta:\n\n"${inputGeneral}"`;
+    
+    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensajeFinal)}`;
+    window.open(urlWhatsApp, '_blank');
+
+    volverAlMenuPrincipal();
+}
+
+// ==========================================
+// LÓGICA AVANZADA DEL CHATBOT Y SERVICIOS
+// ==========================================
+
+// Número de WhatsApp de Skynet Smart (Incluir código de país, ej: 593 para Ecuador)
+const numeroWhatsApp = "593988024097"; // Asegúrate de que este sea el correcto para Skynet Smart
+
+// Respuestas y flujos predefinidos según el servicio
+const flujosServicio = {
+    mantenimiento: {
+        titulo: "🛠️ Mantenimiento y Reparación",
+        mensajeBot: "¡Hola! Para ayudarte con el mantenimiento o reparación, cuéntanos: ¿Qué equipo tienes (marca/modelo) y cuál es el problema principal?",
+        textoWhatsApp: "Hola Skynet Smart, necesito ayuda con el Mantenimiento/Reparación de mi equipo. Te detallo el problema:"
+    },
+    upgrades: {
+        titulo: "🚀 Repotenciación de Equipos",
+        mensajeBot: "¡Excelente decisión! Para cotizar el upgrade adecuado, dinos: ¿Qué computadora tienes y qué buscas mejorar (más velocidad, espacio, etc.)?",
+        textoWhatsApp: "Hola Skynet Smart, me interesa repotenciar mi equipo. Esta es la información:"
+    },
+    redes: {
+        titulo: "📹 Cámaras y Redes",
+        mensajeBot: "¡Perfecto! Para proyectos de seguridad o redes necesitamos algunos detalles. ¿Es para hogar o empresa? Cuéntanos un poco de lo que necesitas.",
+        textoWhatsApp: "Hola Skynet Smart, requiero cotizar un proyecto de Cámaras/Redes. Te cuento los detalles:"
+    },
+    empresas: {
+        titulo: "🏢 Asesoría Corporativa",
+        mensajeBot: "¡Un gusto saludarte! Para darte la mejor asesoría IT, por favor indícanos el nombre de tu empresa y el requerimiento principal.",
+        textoWhatsApp: "Hola Skynet Smart, me contacto por sus servicios de Asesoría Corporativa. El requerimiento es el siguiente:"
+    }
+};
+
+// Variable para saber en qué parte de la conversación estamos
+let flujoActual = null;
+
+function abrirChatServicio(tipoServicio) {
+    const ventanaChat = document.getElementById('skynet-chatbot');
+    const btnAbrirChat = document.getElementById('btn-abrir-chat');
+    const areaMensajes = document.getElementById('chatbot-mensajes');
+    const areaOpciones = document.getElementById('chatbot-opciones');
+
+    // 1. Abrir la ventana
+    ventanaChat.style.display = 'flex';
+    btnAbrirChat.style.display = 'none';
+
+    // 2. Obtener la información del flujo seleccionado
+    const flujo = flujosServicio[tipoServicio];
+    flujoActual = tipoServicio; 
+
+    // 3. Limpiar mensajes anteriores y mostrar el nuevo mensaje del bot
+    areaMensajes.innerHTML = `
+        <div class="mensaje-bot">
+            <p>${flujo.mensajeBot}</p>
+        </div>
+    `;
+
+    // 4. Cambiar las opciones para que el cliente pueda escribir y enviar
+    areaOpciones.innerHTML = `
+        <textarea id="input-problema" placeholder="Escribe aquí los detalles (marca, modelo, problema)..." style="width: 100%; height: 60px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; resize: none; font-family: inherit; margin-bottom: 10px;"></textarea>
+        <button class="btn-opcion-chat" style="background-color: #00cc66; color: white; text-align: center; font-weight: bold;" onclick="enviarWhatsAppServicio()">
+            Enviar a WhatsApp
+        </button>
+        <button class="btn-opcion-chat" style="text-align: center; border-color: #ccc; color: #666;" onclick="volverAlMenuPrincipal()">
+            ← Volver al inicio
+        </button>
+    `;
+    
+    // Auto-scroll hacia abajo
+    areaMensajes.scrollTop = areaMensajes.scrollHeight;
+}
+
+function enviarWhatsAppServicio() {
+    const inputProblema = document.getElementById('input-problema').value;
+    
+    if (inputProblema.trim() === "") {
+        alert("Por favor, escribe un pequeño detalle de tu requerimiento antes de continuar.");
+        return;
+    }
+
+    const flujo = flujosServicio[flujoActual];
+    
+    // Construir el mensaje final combinando la plantilla y lo que escribió el cliente
+    const mensajeFinal = `${flujo.textoWhatsApp}\n\n"${inputProblema}"`;
+    
+    // Codificar la URL y abrir WhatsApp
+    const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensajeFinal)}`;
+    window.open(urlWhatsApp, '_blank');
+
+    // Opcional: Volver al menú principal después de enviar
+    volverAlMenuPrincipal();
+}
+
+// Función para restaurar los 4 botones principales si el usuario se arrepiente
+function volverAlMenuPrincipal() {
+    const areaMensajes = document.getElementById('chatbot-mensajes');
+    const areaOpciones = document.getElementById('chatbot-opciones');
+    flujoActual = null;
+
+    areaMensajes.innerHTML = `
+        <div class="mensaje-bot">
+            <p>¡Hola! Soy el asistente virtual de Skynet Smart. ¿En qué te puedo ayudar hoy?</p>
+        </div>
+    `;
+
+    areaOpciones.innerHTML = `
+        <button class="btn-opcion-chat" onclick="procesarOpcion('catalogo')">💻 Busco equipos o partes</button>
+        <button class="btn-opcion-chat" onclick="procesarOpcion('servicios')">🛠️ Soporte o servicios</button>
+        <button class="btn-opcion-chat" onclick="procesarOpcion('info')">📍 Ubicación y envíos</button>
+        <button class="btn-opcion-chat" onclick="procesarOpcion('asesor')">💬 Hablar con un asesor</button>
+    `;
+}

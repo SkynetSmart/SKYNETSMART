@@ -34,8 +34,11 @@ async function cargarProductos(categoria, subcategoria = "todo") {
     
     // --- 1. EL SEMÁFORO CORREGIDO ---
     let contenedor;
+
     if (categoria === "suministros") {
         contenedor = document.getElementById('galeriaSuministros');
+    } else if (categoria === "computadoras") {
+        contenedor = document.getElementById('galeriacomputadoras');
     } else if (categoria === "celulares") {
         contenedor = document.getElementById('galeriaCelulares');
     } else if (categoria === "accesorios") {
@@ -177,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Carga inicial
     cargarProductos("suministros", "todo");
+    cargarProductos("computadoras", "todo");
     cargarProductos("celulares", "todo");
     cargarProductos("accesorios", "todo"); 
     cargarProductos("impresoras", "todo"); 

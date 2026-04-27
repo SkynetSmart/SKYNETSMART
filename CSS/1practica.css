@@ -682,6 +682,253 @@ body > :not(.footer):last-child {
     display: none;
 }
 
+/* ========================================== */
+/* ESTILOS DEL CHATBOT */
+/* ========================================== */
+
+/* Botón flotante en la esquina inferior derecha */
+.btn-flotante-chat {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #00cc66; /* Verde tipo Skynet */
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+
+.btn-flotante-chat:hover {
+    transform: scale(1.05);
+}
+
+/* Contenedor principal de la ventana del chat */
+.chatbot-container {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 320px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'ABeeZee', sans-serif;
+}
+
+/* Encabezado negro del chat */
+.chatbot-header {
+    background-color: #111;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-titulo {
+    display: flex;
+    align-items: center;
+}
+
+.chatbot-titulo h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.btn-cerrar-chat {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Área donde aparecen los mensajes */
+.chatbot-mensajes {
+    padding: 15px;
+    height: 250px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+}
+
+.mensaje-bot {
+    background-color: #e0e0e0;
+    color: black;
+    padding: 10px 15px;
+    border-radius: 15px 15px 15px 0;
+    margin-bottom: 15px;
+    font-size: 14px;
+    max-width: 85%;
+}
+
+.mensaje-usuario {
+    background-color: #00cc66;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 15px 15px 0 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    max-width: 85%;
+    align-self: flex-end;
+    margin-left: auto;
+}
+
+/* Área de los botones de opciones */
+.chatbot-opciones {
+    padding: 10px;
+    background-color: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-opcion-chat {
+    background-color: white;
+    border: 1px solid #00cc66;
+    color: #333;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.btn-opcion-chat:hover {
+    background-color: #e6ffe6;
+}
+
+/* ========================================== */
+/* DISEÑO DE BANNERS VERTICALES DE SERVICIOS */
+/* ========================================== */
+
+.encabezado-servicios {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgb(0, 0, 0);
+}
+
+.encabezado-servicios h2 {
+    font-size: 2.5rem;
+    color: #00cc66; /* Verde Skynet */
+    margin-bottom: 10px;
+}
+
+.contenedor-servicios-banners {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.banner-servicio {
+    height: 600px; /* Tamaño "Mucho más grande" */
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease;
+}
+
+.banner-servicio:hover {
+    transform: translateY(-10px);
+}
+
+.banner-imagen {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 15%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.1));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+    transition: background 0.3s;
+}
+
+
+.banner-servicio:hover .banner-overlay {
+    background: linear-gradient(to top, rgba(0,204,102,0.5) 5%, rgba(0,0,0,0.6) 45%);
+}
+
+.etiqueta-servicio {
+    background-color: #00cc66;
+    color: black;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 5px;
+    width: fit-content;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.banner-contenido h3 {
+    color: white;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.banner-contenido p {
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    min-height: 70px; /* ESTO ES LA MAGIA: Obliga a que todos tengan la misma altura */
+}
+
+.puntos-clave {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.puntos-clave li {
+    color: #00cc66;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.btn-banner {
+    background-color: transparent;
+    border: 2px solid #00cc66;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.btn-banner:hover {
+    background-color: #00cc66;
+    color: black;
+}
+
 
 
 

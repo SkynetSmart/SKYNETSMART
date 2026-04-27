@@ -12,7 +12,10 @@
         button:hover { background: #0056b3; }
         hr { border: 0; border-top: 2px dashed #ccc; margin: 30px 0; }
         .etiqueta-foto { font-size: 14px; font-weight: bold; color: #333; margin-bottom: 5px; display: block; }
+        
     </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -66,11 +69,37 @@
     <p id="estadoSincro" style="font-weight: bold; text-align: center; margin-top: 10px;"></p>
 </div>
 
+<section id="herramienta-caos" style="margin-top: 40px; padding: 20px; border: 2px solid #00cc66; border-radius: 10px; background-color: #111; color: white;">
+    <h2>🔄 Vinculador Inteligente CAOS</h2>
+    <p>Sube el archivo Excel exportado de CAOS para vincular los códigos con los productos de la web.</p>
+    
+    <input type="file" id="archivo-caos" accept=".xlsx, .xls" style="margin-bottom: 20px;">
+    <button id="btn-procesar-caos" style="background-color: #00cc66; color: black; font-weight: bold; padding: 10px 20px; border: none; cursor: pointer;">Analizar y Buscar Coincidencias</button>
+
+    <div id="resultados-cruce" style="margin-top: 20px; max-height: 400px; overflow-y: auto; display: none;">
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid #00cc66;">
+                    <th>Producto en Firebase (Web)</th>
+                    <th>Sugerencia de CAOS (Excel)</th>
+                    <th>Código CAOS</th>
+                    <th>Vincular</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-coincidencias">
+                </tbody>
+        </table>
+        <button id="btn-guardar-vinculos" style="margin-top: 20px; background-color: #ff3333; color: white; padding: 10px; border: none; cursor: pointer; width: 100%;">
+            ⚠️ Confirmar y Guardar Vínculos en Firebase
+        </button>
+    </div>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, writeBatch, doc, setDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
 
     const firebaseConfig = {
         apiKey: "AIzaSyDawRJ_UEd60LCwxD3Lk-eZsmMffpjWXlg",
@@ -166,55 +195,276 @@
     });
 
     // --- 2. SINCRONIZAR INVENTARIO DESDE CAOS (EXCEL) ---
-    document.getElementById('btnSincronizar').addEventListener('click', () => {
+    document.getElementById('btnSincronizar').addEventListener('click', async () => {
         const file = document.getElementById('inputExcel').files[0];
         if (!file) return alert("⚠️ Primero selecciona el archivo Excel exportado de CAOS.");
 
-        const reader = new FileReader();
+        const btn = document.getElementById('btnSincronizar');
         const estadoText = document.getElementById('estadoSincro');
-        estadoText.innerText = "⏳ Analizando Excel, por favor espera...";
+        
+        btn.disabled = true;
+        btn.innerText = "⏳ Procesando Excel...";
+        estadoText.innerText = "⏳ Analizando Excel y preparando datos...";
         estadoText.style.color = "#007bff";
 
-        reader.onload = async (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const hoja = workbook.Sheets[workbook.SheetNames[0]];
-                const productosExcel = XLSX.utils.sheet_to_json(hoja);
-                
-                let actualizados = 0;
-
-                for (const item of productosExcel) {
-                    const codigoCAOS = String(item.Codigo); 
-                    const stock = parseFloat(item.Disponibilidad);
-                    const precioCAOS = parseFloat(item.PVP);
-
-                    const q = query(collection(db, "productos"), where("codigoInterno", "==", codigoCAOS));
-                    const snap = await getDocs(q);
-
-                    if (!snap.empty) {
-                        const productoActual = snap.docs[0].data();
-                        const nuevoPrecio = (isNaN(precioCAOS) || precioCAOS <= 0) ? productoActual.precio : precioCAOS;
-
-                        // Actualizar Firebase
-                        await updateDoc(snap.docs[0].ref, {
-                            agotado: stock <= 0,
-                            precio: nuevoPrecio
-                        });
-                        actualizados++;
-                    }
+        try {
+            // 1. LEER EL EXCEL
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data, { type: 'array' });
+            const hoja = workbook.Sheets[workbook.SheetNames[0]];
+            const inventarioCAOS = XLSX.utils.sheet_to_json(hoja);
+            
+            // 2. CREAR DICCIONARIO RÁPIDO DE CAOS
+            // Extrae el Codigo, la Disponibilidad y el PVP de tu Excel
+            const mapaCAOS = {};
+            inventarioCAOS.forEach(item => {
+                const cod = String(item.Codigo);
+                if (cod && cod !== "undefined") {
+                    mapaCAOS[cod] = {
+                        stock: parseFloat(item.Disponibilidad) || 0,
+                        precio: parseFloat(item.PVP) || 0
+                    };
                 }
+            });
+
+            // 3. DESCARGAR PRODUCTOS DE FIREBASE Y PREPARAR TRANSACCIÓN MASIVA
+            const productosRef = collection(db, "productos");
+            const snapshot = await getDocs(productosRef);
+            const batch = writeBatch(db);
+            let actualizados = 0;
+
+            estadoText.innerText = "⏳ Actualizando productos en la nube...";
+
+            // 4. COMPARAR Y ACTUALIZAR
+            snapshot.forEach(docSnap => {
+                const dataFB = docSnap.data();
                 
-                estadoText.innerText = `✅ ¡Sincronización exitosa! ${actualizados} productos actualizados.`;
+                // MAGIA: Busca si el producto tiene "codigo_caos" (del vinculador) 
+                // o "codigoInterno" (si lo subiste a mano)
+                const codigoProducto = dataFB.codigo_caos || dataFB.codigoInterno;
+
+                // Si el producto web tiene un código y ese código viene en el Excel de hoy
+                if (codigoProducto && mapaCAOS[codigoProducto]) {
+                    const datosHoy = mapaCAOS[codigoProducto];
+                    
+                    // Actualizamos precio (solo si es válido en CAOS) y estado
+                    const nuevoPrecio = (datosHoy.precio > 0) ? datosHoy.precio : dataFB.precio;
+                    const estaAgotado = datosHoy.stock <= 0;
+
+                    batch.update(docSnap.ref, {
+                        precio: nuevoPrecio,
+                        agotado: estaAgotado
+                    });
+                    
+                    actualizados++;
+                }
+            });
+
+            // 5. ENVIAR CAMBIOS DE GOLPE A FIREBASE
+            if (actualizados > 0) {
+                await batch.commit();
+                estadoText.innerText = `✅ ¡Éxito! ${actualizados} productos fueron actualizados con el stock y precio de CAOS.`;
                 estadoText.style.color = "#28a745";
-            } catch (error) {
-                console.error("Error leyendo Excel:", error);
-                estadoText.innerText = "❌ Error al procesar el archivo Excel. Revisa la consola.";
-                estadoText.style.color = "#dc3545";
+            } else {
+                estadoText.innerText = "⚠️ No se encontraron productos coincidentes para actualizar.";
+                estadoText.style.color = "#ffc107"; // Amarillo de advertencia
             }
-        };
-        reader.readAsArrayBuffer(file);
+
+        } catch (error) {
+            console.error("Error en sincronización:", error);
+            estadoText.innerText = "❌ Error al procesar. Revisa la consola (F12).";
+            estadoText.style.color = "#dc3545";
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Actualizar Inventario";
+        }
     });
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const inputFile = document.getElementById('archivo-caos');
+    const btnProcesar = document.getElementById('btn-procesar-caos');
+    const btnGuardar = document.getElementById('btn-guardar-vinculos');
+    
+    let coincidenciasAprobadas = []; // Aquí guardaremos lo que vas a subir
+
+    // ⚠️ CONFIGURACIÓN CRÍTICA: Escribe aquí el nombre EXACTO de las columnas de tu Excel de CAOS
+    const COLUMNA_Descripción_CAOS = "Descripción"; // Ej: "Descripción", "Nombre", "Detalle"
+    const COLUMNA_CODIGO_CAOS = "Codigo";         // Ej: "Código", "Cod", "SKU"
+
+    btnProcesar.addEventListener('click', async () => {
+        const file = inputFile.files[0];
+        if (!file) return alert("Por favor, selecciona el archivo de CAOS primero.");
+
+        btnProcesar.innerText = "Leyendo Excel y Firebase...";
+        
+        try {
+            // 1. LEER EL EXCEL CON SHEETJS
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
+            const inventarioCAOS = XLSX.utils.sheet_to_json(primeraHoja);
+
+            // 2. OBTENER PRODUCTOS DE FIREBASE (Solo los que NO tienen código CAOS)
+            const productosRef = collection(db, "productos");
+            const snapshot = await getDocs(productosRef);
+            let productosFirebase = [];
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (!data.codigo_caos) { // Solo si no ha sido vinculado antes
+                    productosFirebase.push({ id: doc.id, titulo: data.titulo });
+                }
+            });
+
+            // 3. EL ALGORITMO DE EMPAREJAMIENTO (Smart Matcher)
+            const tabla = document.getElementById('tabla-coincidencias');
+            tabla.innerHTML = "";
+            coincidenciasAprobadas = [];
+
+            productosFirebase.forEach(prodFB => {
+                let mejorCoincidencia = null;
+                let mayorPuntaje = 0;
+
+                // Comparamos contra todo el Excel
+                inventarioCAOS.forEach(itemCAOS => {
+                    const nombreCAOS = itemCAOS[COLUMNA_Descripción_CAOS] || "";
+                    const puntaje = calcularSimilitud(prodFB.titulo, String(nombreCAOS));
+
+                    // Si se parecen más del 40% y es el puntaje más alto hasta ahora
+                    if (puntaje > 0.4 && puntaje > mayorPuntaje) {
+                        mayorPuntaje = puntaje;
+                        mejorCoincidencia = {
+                            nombre: nombreCAOS,
+                            codigo: itemCAOS[COLUMNA_CODIGO_CAOS]
+                        };
+                    }
+                });
+
+                // 4. DIBUJAR EN LA TABLA
+                if (mejorCoincidencia) {
+                    const fila = document.createElement('tr');
+                    fila.style.borderBottom = "1px solid #333";
+                    fila.innerHTML = `
+                        <td style="padding: 10px;">${prodFB.titulo}</td>
+                        <td style="color: #00cc66;">${mejorCoincidencia.nombre}</td>
+                        <td><strong>${mejorCoincidencia.codigo}</strong></td>
+                        <td><input type="checkbox" checked class="check-vincular" 
+                            data-fbid="${prodFB.id}" data-caoscod="${mejorCoincidencia.codigo}"></td>
+                    `;
+                    tabla.appendChild(fila);
+                }
+            });
+
+            document.getElementById('resultados-cruce').style.display = 'block';
+            btnProcesar.innerText = "Análisis Completado";
+
+        } catch (error) {
+            console.error(error);
+            alert("Error al procesar. Revisa la consola.");
+            btnProcesar.innerText = "Analizar y Buscar Coincidencias";
+        }
+    });
+
+    // 5. EJECUTAR EL GUARDADO MASIVO (BATCH)
+    btnGuardar.addEventListener('click', async () => {
+        const checkboxes = document.querySelectorAll('.check-vincular:checked');
+        if (checkboxes.length === 0) return alert("No hay nada seleccionado.");
+
+        if (!confirm(`Vas a vincular ${checkboxes.length} productos. ¿Estás seguro?`)) return;
+
+        btnGuardar.innerText = "Guardando en Firebase...";
+        
+        try {
+            const batch = writeBatch(db); // Inicia la transacción masiva
+
+            checkboxes.forEach(chk => {
+                const docRef = doc(db, "productos", chk.dataset.fbid);
+                // INYECTAMOS EL NUEVO CAMPO SIN BORRAR LO DEMÁS
+                batch.update(docRef, { codigo_caos: chk.dataset.caoscod }); 
+            });
+
+            await batch.commit(); // Dispara todo a la nube en 1 segundo
+            
+            alert("¡Éxito! Todos los productos han sido vinculados a CAOS.");
+            document.getElementById('resultados-cruce').style.display = 'none';
+            btnGuardar.innerText = "⚠️ Confirmar y Guardar Vínculos";
+            
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            alert("Hubo un error al guardar en Firebase.");
+        }
+    });
+
+    // ALGORITMO V3: MODO "PARANOICO" (Evita falsos positivos en suministros)
+    function calcularSimilitud(str1, str2) {
+        const s1 = str1.toLowerCase();
+        const s2 = str2.toLowerCase();
+
+        // ==========================================
+        // REGLA 1: EL "KILL SWITCH" DE COLORES
+        // ==========================================
+        function detectarColor(texto) {
+            // Busca la palabra aislada, para que no confunda "cyan" con una palabra que contenga esas letras
+            if (texto.match(/\b(amarillo|yellow|y)\b/)) return "Y";
+            if (texto.match(/\b(cyan|cian|c)\b/)) return "C";
+            if (texto.match(/\b(magenta|m)\b/)) return "M";
+            if (texto.match(/\b(negro|black|bk)\b/)) return "K";
+            return null;
+        }
+        
+        const color1 = detectarColor(s1);
+        const color2 = detectarColor(s2);
+        
+        // Si ambos textos mencionan un color explícitamente, pero NO es el mismo, 
+        // es imposible que sean el mismo cartucho. Puntuación = 0%.
+        if (color1 && color2 && color1 !== color2) {
+            return 0; 
+        }
+
+        // ==========================================
+        // REGLA 2: PREPARACIÓN DE PALABRAS
+        // ==========================================
+        // Mantenemos los guiones para no romper códigos como "FX-890"
+        const words1 = s1.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 1);
+        const words2 = s2.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 1);
+
+        if(words1.length === 0 || words2.length === 0) return 0;
+
+        // ==========================================
+        // REGLA 3: EL "KILL SWITCH" DE MODELOS/CÓDIGOS
+        // ==========================================
+        // Extraemos cualquier palabra que contenga al menos un número (Ej: T748XXL, FX-890, 480GB)
+        const modelos1 = words1.filter(w => /[0-9]/.test(w));
+        const modelos2 = words2.filter(w => /[0-9]/.test(w));
+
+        // Si ambos nombres incluyen códigos numéricos, AL MENOS UNO debe coincidir parcial o totalmente.
+        // Si no comparten ningún número/modelo, penalizamos severamente la sugerencia.
+        if (modelos1.length > 0 && modelos2.length > 0) {
+            const compartenModelo = modelos1.some(m1 => modelos2.some(m2 => m1 === m2 || m1.includes(m2) || m2.includes(m1)));
+            if (!compartenModelo) {
+                return 0.1; // Le damos un 10% máximo para que se vaya al fondo de las opciones
+            }
+        }
+
+        // ==========================================
+        // REGLA 4: CONTEO ESTÁNDAR
+        // ==========================================
+        let matches = 0;
+        words1.forEach(w1 => {
+            const matchFound = words2.some(w2 => w1 === w2 || (w1.length > 3 && w2.includes(w1)) || (w2.length > 3 && w1.includes(w2)));
+            if (matchFound) matches++;
+        });
+
+        // Usamos la longitud más pequeña para no castigar si CAOS tiene un nombre exageradamente largo
+        return matches / Math.min(words1.length, words2.length);
+    }
+});
+
 </script>
+
+
+
 </body>
 </html>
