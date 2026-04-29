@@ -306,14 +306,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
             const inventarioCAOS = XLSX.utils.sheet_to_json(primeraHoja);
 
-            // 2. OBTENER PRODUCTOS DE FIREBASE (Solo los que NO tienen código CAOS)
+            // 2. OBTENER PRODUCTOS DE FIREBASE (Solo los que NO tienen ningún tipo de código)
             const productosRef = collection(db, "productos");
             const snapshot = await getDocs(productosRef);
             let productosFirebase = [];
             
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (!data.codigo_caos) { // Solo si no ha sido vinculado antes
+                
+                // La corrección: Si no tiene 'codigo_caos' Y TAMPOCO tiene 'codigoInterno', entonces lo agregamos a la lista
+                if (!data.codigo_caos && !data.codigoInterno) { 
                     productosFirebase.push({ id: doc.id, titulo: data.titulo });
                 }
             });
@@ -397,16 +399,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ALGORITMO V3: MODO "PARANOICO" (Evita falsos positivos en suministros)
+    // ALGORITMO V4: HÍBRIDO (Mantiene seguridad en tintas, permite genéricos)
     function calcularSimilitud(str1, str2) {
         const s1 = str1.toLowerCase();
         const s2 = str2.toLowerCase();
 
         // ==========================================
-        // REGLA 1: EL "KILL SWITCH" DE COLORES
+        // REGLA 1: EL KILL SWITCH DE COLORES (Intocable)
         // ==========================================
         function detectarColor(texto) {
-            // Busca la palabra aislada, para que no confunda "cyan" con una palabra que contenga esas letras
             if (texto.match(/\b(amarillo|yellow|y)\b/)) return "Y";
             if (texto.match(/\b(cyan|cian|c)\b/)) return "C";
             if (texto.match(/\b(magenta|m)\b/)) return "M";
@@ -417,39 +418,42 @@ document.addEventListener('DOMContentLoaded', () => {
         const color1 = detectarColor(s1);
         const color2 = detectarColor(s2);
         
-        // Si ambos textos mencionan un color explícitamente, pero NO es el mismo, 
-        // es imposible que sean el mismo cartucho. Puntuación = 0%.
         if (color1 && color2 && color1 !== color2) {
-            return 0; 
+            return 0; // Si los colores chocan, se aborta inmediatamente.
         }
 
         // ==========================================
-        // REGLA 2: PREPARACIÓN DE PALABRAS
+        // REGLA 2: PREPARACIÓN DE PALABRAS Y NÚMEROS
         // ==========================================
-        // Mantenemos los guiones para no romper códigos como "FX-890"
         const words1 = s1.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 1);
         const words2 = s2.replace(/[^a-z0-9\s-]/g, '').split(/\s+/).filter(w => w.length > 1);
 
         if(words1.length === 0 || words2.length === 0) return 0;
 
-        // ==========================================
-        // REGLA 3: EL "KILL SWITCH" DE MODELOS/CÓDIGOS
-        // ==========================================
-        // Extraemos cualquier palabra que contenga al menos un número (Ej: T748XXL, FX-890, 480GB)
         const modelos1 = words1.filter(w => /[0-9]/.test(w));
         const modelos2 = words2.filter(w => /[0-9]/.test(w));
 
-        // Si ambos nombres incluyen códigos numéricos, AL MENOS UNO debe coincidir parcial o totalmente.
-        // Si no comparten ningún número/modelo, penalizamos severamente la sugerencia.
+        let multiplicador = 1.0;
+
+        // ==========================================
+        // REGLA 3: EVALUACIÓN FLEXIBLE DE MODELOS
+        // ==========================================
+        // Si AMBOS tienen números (ej. "Cable 1m" vs "Cable 2m", o "Core i5" vs "Core i7")
         if (modelos1.length > 0 && modelos2.length > 0) {
             const compartenModelo = modelos1.some(m1 => modelos2.some(m2 => m1 === m2 || m1.includes(m2) || m2.includes(m1)));
+            
             if (!compartenModelo) {
-                return 0.1; // Le damos un 10% máximo para que se vaya al fondo de las opciones
+                // No lo matamos a 0%, pero lo penalizamos bajando su nota a la mitad 
+                // para evitar que se mezclen cables de diferentes medidas o discos de distinta capacidad.
+                multiplicador = 0.4; 
+            } else {
+                // Si comparten un número o modelo exacto, le damos un bono de confianza del 30%
+                multiplicador = 1.3;
             }
         }
 
         // ==========================================
-        // REGLA 4: CONTEO ESTÁNDAR
+        // REGLA 4: CONTEO DE PALABRAS ESTÁNDAR (Para accesorios y genéricos)
         // ==========================================
         let matches = 0;
         words1.forEach(w1 => {
@@ -457,8 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (matchFound) matches++;
         });
 
-        // Usamos la longitud más pequeña para no castigar si CAOS tiene un nombre exageradamente largo
-        return matches / Math.min(words1.length, words2.length);
+        // Calculamos nota base y multiplicamos por los bonos/penalizaciones de la Regla 3
+        let puntajeFinal = (matches / Math.min(words1.length, words2.length)) * multiplicador;
+        
+        // Evitamos que el bono pase del 100% (1.0)
+        return Math.min(puntajeFinal, 1.0);
     }
 });
 
