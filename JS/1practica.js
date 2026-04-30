@@ -97,10 +97,14 @@ const primeraClonada = imagenesOriginales[0].cloneNode(true);
 carrusel.appendChild(primeraClonada);
 
 const moverCarrusel = (conAnimacion = true) => {
-    // Si queremos un salto instantáneo, quitamos la transición
+    // MAGIA: El JS lee automáticamente el ancho real de la caja en píxeles
+    // No importa qué tamaño le pongas en el CSS, el JS lo sabrá.
+    const anchoExacto = carrusel.children[0].clientWidth; 
+
     carrusel.style.transition = conAnimacion ? "transform 0.8s ease" : "none";
-    carrusel.style.transform = `translateX(-${index * 600}px)`;
+    carrusel.style.transform = `translateX(-${index * anchoExacto}px)`; 
 };
+
 
 const siguiente = () => {
     index++;
@@ -537,3 +541,31 @@ function volverAlMenuPrincipal() {
         <button class="btn-opcion-chat" onclick="procesarOpcion('asesor')">💬 Hablar con un asesor</button>
     `;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const reproductor = document.getElementById('reproductor-promo');
+    
+    // Aquí pones las rutas exactas de tus dos (o más) videos
+    const listaVideos = [
+        "IMAGENES/imagenes publicidad/publicidadvideolaptopopen.mp4",
+        "IMAGENES/imagenes publicidad/publicidadvideocelulares.mp4",
+        "IMAGENES/imagenes publicidad/Download.mp4", 
+        "IMAGENES/imagenes publicidad/publicidadosmo.mp4" // 
+    ];
+    
+    let indiceActual = 0;
+
+    // Escuchamos cuando el video actual termina
+    reproductor.addEventListener('ended', () => {
+        indiceActual++; // Pasamos al siguiente
+        
+        // Si ya llegamos al final de la lista, volvemos al inicio (Loop general)
+        if (indiceActual >= listaVideos.length) {
+            indiceActual = 0; 
+        }
+        
+        // Cambiamos el origen del video y lo reproducimos
+        reproductor.src = listaVideos[indiceActual];
+        reproductor.play();
+    });
+});

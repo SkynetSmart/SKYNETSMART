@@ -147,23 +147,33 @@ async function cargarProductos(categoria, subcategoria = "todo") {
             return;
         }
 
-        // --- 4. DIBUJAMOS LAS TARJETAS ---
+       // --- 4. DIBUJAMOS LAS TARJETAS (CON ENLACE A DETALLE) ---
         listaProductos.forEach((producto) => {
             const id = producto.id;
             const claseAgotado = producto.agotado ? 'agotado' : '';
+            
+            // LA SOLUCIÓN: Si no existe codigo_caos, usa codigoInterno por defecto.
+            const codigoParaUrl = producto.codigo_caos || producto.codigoInterno || id;
 
+            // Creamos la tarjeta. Nota que ahora la imagen y el título YA USAN codigoParaUrl
             const tarjeta = `
                 <div class="tarjeta item-suministro ${claseAgotado}">
-                    <div class="contenedor-imagen-standard" onclick="alternarFotos('${id}')" style="cursor:pointer;">
-                        <img id="img1_${id}" src="${producto.imagen}">
-                        <img id="img2_${id}" src="${producto.imagen2 || producto.imagen}" style="display:none;">
-                    </div>
-                    <h3 class="titulocompu1">${producto.titulo}</h3>
+                    <a href="producto.html?id=${codigoParaUrl}" style="text-decoration: none; color: inherit;">
+                        <div class="contenedor-imagen-standard">
+                            <img src="${producto.imagen}">
+                        </div>
+                        <h3 class="titulocompu1">${producto.titulo}</h3>
+                    </a>
+                    
                     <details> 
-                        <summary>Más información</summary>
+                        <summary>Resumen rápido</summary>
                         <p>${producto.descripcion}</p>
                         <br>
                         <h1>PRECIO: $${producto.precio}</h1>
+                        <a href="producto.html?id=${codigoParaUrl}" 
+                           style="display: block; color: #00cc66; font-weight: bold; margin-top: 10px; text-align: center;">
+                           Ver especificaciones y comprar
+                        </a>
                     </details>
                 </div>
             `;

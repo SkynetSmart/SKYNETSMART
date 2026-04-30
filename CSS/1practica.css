@@ -323,24 +323,34 @@ img {
     width: 100%;
 }
 
-.publicidad {
+/* .publicidad {
     width: 600px;
     height: 375px;
     overflow: hidden;
     position: relative;
-    flex-shrink: 0; /* Evita que el carrusel se aplaste */
+    flex-shrink: 0; Evita que el carrusel se aplaste */
+    /* box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
+    border-radius: 10px;
+    } */
+
+    .publicidad {
+    width: 420px;  /* Lo hacemos más angosto para que abrace la imagen vertical */
+    height: 550px; /* Lo hacemos mucho más alto para que sea imponente */
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0; 
     box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
     border-radius: 10px;
-}
+    background-color: #000000; /* Fondo negro por si alguna imagen es ligeramente distinta */
+    }
 
 .videopublicidad {
     width: 380px !important;
-    height: 480px !important;
-    position: relative; /* YA NO ES FIXED, ahora se mueve con la página */
+    height: 550px !important; /* IGUALAMOS la altura a 550px para mantener la simetría con el carrusel */
+    position: relative; 
     border-radius: 10px;
     box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
     overflow: hidden;
-    
 }
 
 .videopublicidad video {
@@ -354,11 +364,20 @@ img {
   transition: transform 0.8s ease;
 }
 
+
 .publicidad-inner img {
+    width: 420px; 
+    height: 550px; 
+    flex-shrink: 0;
+    object-fit: cover !important; /* CRÍTICO: 'cover' obliga a la imagen a llenar todo el espacio sin bordes */
+    padding: 0px; /* CRÍTICO: Eliminamos el relleno que te dejaba un marco blanco */
+    box-sizing: border-box;
+}
+/* .publicidad-inner img {
   width: 600px;
   height: 375px;
   flex-shrink: 0;
-}
+} */
 
 
 .flecha {
@@ -929,6 +948,208 @@ body > :not(.footer):last-child {
     color: black;
 }
 
+/* =========================================
+   ESTILOS DE LA PÁGINA DE DETALLE (PRODUCTO.HTML)
+========================================= */
+.contenedor-detalle-producto {
+    display: flex;
+    max-width: 1200px;
+    margin: 40px auto;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 40px;
+    gap: 40px;
+    font-family: 'ABeeZee', sans-serif;
+}
 
+/* Lado Izquierdo: Foto */
+.detalle-izq {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.caja-imagen-principal img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Lado Derecho: Info */
+.detalle-der {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#prod-titulo {
+    font-size: 28px;
+    color: #111;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.codigo-producto {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Precio en grande */
+.caja-precio {
+    margin-bottom: 30px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
+}
+
+#prod-precio {
+    font-size: 40px;
+    color: #d35400; /* Naranja/Rojo corporativo tipo Tecno Mega para llamar la atención */
+    margin: 0;
+    font-family: 'Oswald', sans-serif;
+}
+
+.iva-nota {
+    font-size: 13px;
+    color: #888;
+}
+
+/* Descripción */
+.descripcion-producto h3 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#prod-descripcion {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* Botón WhatsApp */
+.btn-whatsapp-gigante {
+    background-color: #25D366;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn-whatsapp-gigante:hover {
+    background-color: #128C7E;
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVO: Para celulares, una columna debajo de la otra */
+@media (max-width: 768px) {
+    .contenedor-detalle-producto {
+        flex-direction: column;
+        padding: 20px;
+        margin: 20px 10px;
+    }
+}
+
+/* =========================================
+   GALERÍA DE MINIATURAS
+========================================= */
+.detalle-izq {
+    flex-direction: column; /* Obliga a que las miniaturas vayan debajo de la foto principal */
+}
+
+.caja-miniaturas {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+.miniatura {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px;
+    background-color: white;
+}
+
+/* Efecto al pasar el mouse y al estar seleccionada */
+.miniatura:hover, .miniatura.activa {
+    border-color: #00cc66; /* Verde Skynet */
+    transform: scale(1.05);
+}
+
+/* =========================================
+   MODAL TIPO LIGHTBOX (IMAGEN EXPANDIDA)
+========================================= */
+.modal-oculto {
+    display: none; /* Escondido por defecto */
+    position: fixed;
+    z-index: 10000; /* Para que tape absolutamente todo, incluso el menú */
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Fondo negro al 90% */
+}
+
+.modal-contenido {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 85vh; /* Ocupa máximo el 85% del alto de la pantalla */
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.cerrar-modal {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: #f1f1f1;
+    font-size: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cerrar-modal:hover {
+    color: #00cc66; /* Se pinta de verde Skynet al pasar el mouse */
+}
+
+/* Invita al cliente a hacer clic en la foto normal */
+#prod-imagen {
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+#prod-imagen:hover {
+    transform: scale(1.02); /* Pequeño zoom al pasar el mouse */
+}
 
 
