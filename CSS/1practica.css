@@ -725,7 +725,7 @@ body > :not(.footer):last-child {
 
 /* La magia del contraste: Esto vuelve tu logo oscuro a color BLANCO puro y engrosa las líneas */
 .btn-flotante-chat img {
-    width: 100%; /* Aumentamos el tamaño del 55% al 80% */
+    width: 80%; /* Aumentamos el tamaño del 55% al 80% */
     height: auto;
     /* Invertimos el color y le damos un micro-resplandor para que las líneas destaquen */
     filter: brightness(0) invert(1) drop-shadow(0px 0px 1px rgba(255,255,255,0.6)); 
