@@ -68,19 +68,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        // 3. PINTAR LOS DATOS EN LA PÁGINA (Conectado a tus campos exactos)
+       // 3. PINTAR LOS DATOS EN LA PÁGINA (Y apagar el Skeleton)
+        
+        // Retiramos las clases de animación
+        document.getElementById("prod-titulo").classList.remove("skeleton", "skel-titulo");
+        document.getElementById("prod-codigo").classList.remove("skeleton", "skel-codigo");
+        document.getElementById("prod-precio").classList.remove("skeleton", "skel-precio");
+        document.getElementById("prod-descripcion").classList.remove("skeleton", "skel-texto");
+        document.getElementById("caja-img-skeleton").classList.remove("skeleton", "skel-img");
 
+        // Inyectamos los textos reales
         document.getElementById("prod-titulo").textContent = datosProducto.titulo || "Producto sin título";
         document.getElementById("prod-codigo").textContent = idProducto;
         
-        // Leemos tu campo exacto "precio" y lo forzamos a tener 2 decimales visuales
         const precioFormateado = datosProducto.precio ? Number(datosProducto.precio).toFixed(2) : "0.00";
         document.getElementById("prod-precio").textContent = `$${precioFormateado}`;
         
         document.getElementById("prod-descripcion").textContent = datosProducto.descripcion || "Sin descripción disponible.";
+
+        // Hacemos que la imagen real se vuelva visible
+        const imagenPrincipal = document.getElementById("prod-imagen");
+        imagenPrincipal.style.opacity = "1"; 
         
         // --- MOTOR GRÁFICO DE IMÁGENES E INTERACTIVIDAD ---
-        const imagenPrincipal = document.getElementById("prod-imagen");
         const contenedorMiniaturas = document.getElementById("contenedor-miniaturas");
 
         if (datosProducto.imagen) {

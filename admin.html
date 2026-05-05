@@ -26,7 +26,7 @@
         <input type="checkbox" id="checkAgotado" style="width: auto;"> ¿Producto Agotado?
     </label>
 
-    <input type="text" id="codigoInterno" placeholder="Código CAOS (Ej. 4357) - ¡Vital para sincronizar!">
+    <input type="text" id="codigo_caos" placeholder="Código CAOS (Ej. 4357) - ¡Vital para sincronizar!">
     <input type="text" id="idLimpio" placeholder="ID Web (Ej. teclado-genius-kb700) - Sin espacios">
     
     <input type="text" id="titulo" placeholder="Nombre del equipo (Ej. Lenovo IdeaPad)">
@@ -134,7 +134,7 @@
     document.getElementById('btnGuardar').addEventListener('click', async () => {
         const btn = document.getElementById('btnGuardar');
         const esAgotado = document.getElementById('checkAgotado').checked;
-        const inputCodigo = document.getElementById('codigoInterno').value.trim();
+        const inputCodigo = document.getElementById('codigo_caos').value.trim();
         const inputIdLimpio = document.getElementById('idLimpio').value.trim();
         const inputTitulo = document.getElementById('titulo').value.trim();
         const inputPrecio = document.getElementById('precio').value.trim();
@@ -166,7 +166,7 @@
 
             // Guardamos en Firebase con setDoc para usar el ID Web (idLimpio)
             await setDoc(doc(db, "productos", inputIdLimpio), { 
-                codigoInterno: inputCodigo,
+                codigo_caos: inputCodigo,
                 titulo: inputTitulo,
                 precio: parseFloat(inputPrecio.replace('$', '')),
                 descripcion: inputDescripcion,

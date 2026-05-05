@@ -701,30 +701,51 @@ body > :not(.footer):last-child {
     display: none;
 }
 
-/* ========================================== */
-/* ESTILOS DEL CHATBOT */
-/* ========================================== */
+/* =========================================
+   SISTEMA DE CHATBOT SKYNET (ESTILO CORPORATIVO)
+========================================= */
 
-/* Botón flotante en la esquina inferior derecha */
+/* 1. El botón flotante: Fondo negro con borde y brillo Skynet */
 .btn-flotante-chat {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #00cc66; /* Verde tipo Skynet */
-    color: white;
-    border: none;
-    padding: 15px 20px;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
+    bottom: 30px;
+    right: 30px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background-color: #000000; /* Fondo negro absoluto */
+    border: 2px solid #00cc66; /* Anillo verde neón */
     cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     z-index: 1000;
-    transition: transform 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: latido-chat 2s infinite; 
 }
 
-.btn-flotante-chat:hover {
-    transform: scale(1.05);
+/* La magia del contraste: Esto vuelve tu logo oscuro a color BLANCO puro y engrosa las líneas */
+.btn-flotante-chat img {
+    width: 1000%; /* Aumentamos el tamaño del 55% al 80% */
+    height: auto;
+    /* Invertimos el color y le damos un micro-resplandor para que las líneas destaquen */
+    filter: brightness(0) invert(1) drop-shadow(0px 0px 1px rgba(255,255,255,0.6)); 
+}
+
+/* El motor del latido (El brillo se proyecta hacia afuera del anillo) */
+@keyframes latido-chat {
+    0% { transform: scale(1); box-shadow: 0px 0px 15px rgba(0, 204, 102, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0px 0px 25px rgba(0, 204, 102, 0.9); }
+    100% { transform: scale(1); box-shadow: 0px 0px 15px rgba(0, 204, 102, 0.4); }
+}
+
+/* 📱 REGLA PARA CELULARES */
+@media (max-width: 768px) {
+    .btn-flotante-chat {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+    }
 }
 
 /* Contenedor principal de la ventana del chat */
@@ -1151,5 +1172,31 @@ body > :not(.footer):last-child {
 #prod-imagen:hover {
     transform: scale(1.02); /* Pequeño zoom al pasar el mouse */
 }
+
+/*------------------------------------------------------------------------------------------------*/
+
+/* =========================================
+   SKELETON LOADERS (EFECTO DE CARGA)
+========================================= */
+.skeleton {
+    background: #e0e0e0;
+    background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+    background-size: 200% 100%;
+    animation: 1.5s shimmer linear infinite;
+    color: transparent !important; /* Oculta cualquier texto residual */
+    border-radius: 6px;
+    user-select: none;
+}
+
+@keyframes shimmer {
+    to { background-position-x: -200%; }
+}
+
+/* Tamaños específicos para simular cada parte de tu página */
+.skel-img { width: 100%; height: 350px; border-radius: 10px; }
+.skel-titulo { width: 85%; height: 35px; margin-bottom: 10px; display: block; }
+.skel-precio { width: 40%; height: 45px; margin-bottom: 10px; display: block; }
+.skel-texto { width: 100%; height: 80px; display: block; }
+.skel-codigo { width: 100px; height: 18px; display: inline-block; vertical-align: middle; }
 
 

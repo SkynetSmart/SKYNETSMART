@@ -29,28 +29,31 @@
     <main class="contenedor-detalle-producto">
         <!-- Lado Izquierdo: La Foto -->
         <div class="detalle-izq">
-            <div class="caja-imagen-principal">
-                <img id="prod-imagen" alt=" Cargando imagen... ">
+            <!-- La caja principal nace siendo un Skeleton Gris -->
+            <div class="caja-imagen-principal skeleton skel-img" id="caja-img-skeleton">
+                <!-- La imagen real nace transparente (opacity: 0) -->
+                <img id="prod-imagen" alt="" style="opacity: 0; transition: opacity 0.5s ease;">
             </div>
             
-            <!-- NUEVO: Contenedor para las fotos pequeñas -->
-            <div class="caja-miniaturas" id="contenedor-miniaturas">
-                <!-- El JavaScript inyectará las fotos aquí -->
-            </div>
+            <!-- Contenedor para las fotos pequeñas -->
+            <div class="caja-miniaturas" id="contenedor-miniaturas"></div>
         </div>
+        
         <!-- Lado Derecho: La Información -->
         <div class="detalle-der">
-            <h1 id="prod-titulo">Cargando producto...</h1>
-            <p class="codigo-producto">Código: <span id="prod-codigo">---</span></p>
+            <!-- Los textos nacen vacíos y con la clase Skeleton -->
+            <h1 id="prod-titulo" class="skeleton skel-titulo"></h1>
+            
+            <p class="codigo-producto">Código: <span id="prod-codigo" class="skeleton skel-codigo"></span></p>
             
             <div class="caja-precio">
-                <h2 id="prod-precio">$0.00</h2>
+                <h2 id="prod-precio" class="skeleton skel-precio"></h2>
                 <span class="iva-nota">(Precio incluye IVA)</span>
             </div>
 
             <div class="descripcion-producto">
                 <h3>Características principales:</h3>
-                <p id="prod-descripcion">Obteniendo especificaciones desde la base de datos...</p>
+                <p id="prod-descripcion" class="skeleton skel-texto"></p>
             </div>
 
             <!-- EL BOTÓN TRANSACCIONAL -->
