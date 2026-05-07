@@ -1200,3 +1200,22 @@ body > :not(.footer):last-child {
 .skel-codigo { width: 100px; height: 18px; display: inline-block; vertical-align: middle; }
 
 
+/* =========================================
+   VITRINA DE PRODUCTOS RELACIONADOS (CORREGIDA)
+========================================= */
+#contenedor-relacionados {
+    display: flex;
+   
+    gap: 30px; 
+    padding: 20px 0; /* Quitamos el padding lateral para ganar espacio */
+    justify-content: center; /* Centrado perfecto y absoluto garantizado */
+}
+
+#contenedor-relacionados .tarjeta {
+    width: 250px; /* Tamaño fijo e idéntico para todas las tarjetas */
+    flex: 0 0 auto;
+    margin: 0; 
+}
+
+/* Borramos la regla @media que pusimos antes, porque el flex-wrap hace 
+   todo el trabajo responsivo automáticamente sin que tengamos que programarlo */

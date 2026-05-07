@@ -1,6 +1,6 @@
     // 1. IMPORTAMOS LAS HERRAMIENTAS DE FIREBASE DIRECTO DE GOOGLE
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, doc, getDoc, limit } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // 2. TUS CREDENCIALES (Ve a tu archivo catalogo.js o admin.html, copia tu firebaseConfig real y pégalo aquí)
 const firebaseConfig = {
@@ -146,10 +146,104 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.open(enlaceWhatsapp, '_blank');
         });
 
+        // ==========================================
+        // 🚀 LA CORRECCIÓN: Llamamos a la función AQUÍ ADENTRO
+        // ==========================================
+        if (datosProducto && datosProducto.categoria) {
+            cargarRelacionados(datosProducto.categoria, idProducto);
+        }
+
     } catch (error) {
         console.error("Error obteniendo el producto:", error);
         document.getElementById("prod-titulo").textContent = "Error de conexión.";
     }
+
+
+    // ==========================================
+        // VENDEDOR SILENCIOSO: PRODUCTOS RELACIONADOS (DINÁMICO Y ALEATORIO)
+        // ==========================================
+        async function cargarRelacionados(categoriaActual, idActual) {
+            const contenedorRelacionados = document.getElementById("contenedor-relacionados");
+            if (!contenedorRelacionados) return;
+
+            try {
+                // 1. Pescamos con una red más grande: Traemos hasta 20 productos de la misma categoría
+                const qRel = query(
+                    collection(db, "productos"), 
+                    where("categoria", "==", categoriaActual),
+                    limit(20) 
+                );
+                const snapshotRel = await getDocs(qRel);
+                
+                let productosDisponibles = [];
+
+                // 2. Metemos todos los resultados válidos en un arreglo (lista)
+                snapshotRel.forEach(docRel => {
+                    const dataRel = docRel.data();
+                    const idRel = docRel.id;
+
+                    // Filtramos para no mostrar el producto actual Y que NO esté agotado en CAOS
+                    if (idRel !== idActual && dataRel.codigo_caos !== idActual && !dataRel.agotado) {
+                        productosDisponibles.push({ id: idRel, datos: dataRel });
+                    }
+                });
+
+                // 3. EL TRUCO DE LA BARAJA: Desordenamos la lista de forma aleatoria
+                productosDisponibles.sort(() => Math.random() - 0.5);
+
+                contenedorRelacionados.innerHTML = "";
+                let mostrados = 0;
+
+                // 4. Mostramos solo los primeros 4 de la lista ya mezclada
+                for (let i = 0; i < productosDisponibles.length; i++) {
+                    if (mostrados >= 4) break; // Si ya pintamos 4, detenemos el ciclo
+
+                    const producto = productosDisponibles[i];
+                    const dataRel = producto.datos;
+                    const claseAgotado = dataRel.agotado ? 'agotado' : '';
+                    const codigoUrl = dataRel.codigo_caos || dataRel.codigoInterno || producto.id;
+
+                    // Dibujamos la tarjeta
+                    const tarjetaRelacionada = `
+                        <div class="tarjeta item-suministro ${claseAgotado}">
+                            <a href="producto.html?id=${codigoUrl}" style="text-decoration: none; color: inherit;">
+                                <div class="contenedor-imagen-standard">
+                                    <img src="${dataRel.imagen}" alt="${dataRel.titulo}">
+                                </div>
+                                <h3 class="titulocompu1">${dataRel.titulo}</h3>
+                            </a>
+                            <details> 
+                                <summary>Resumen rápido</summary>
+                                <br>
+                                <h1>PRECIO: $${dataRel.precio}</h1>
+                                <a href="producto.html?id=${codigoUrl}" 
+                                   style="display: block; color: #00cc66; font-weight: bold; margin-top: 10px; text-align: center;">
+                                   Ver producto
+                                </a>
+                            </details>
+                        </div>
+                    `;
+                    contenedorRelacionados.innerHTML += tarjetaRelacionada;
+                    mostrados++;
+                }
+
+                if (mostrados === 0) {
+                    contenedorRelacionados.innerHTML = "<p style='grid-column: 1 / -1; text-align: center;'>No hay más productos en esta categoría por ahora.</p>";
+                }
+
+            } catch (error) {
+                console.error("Error cargando relacionados:", error);
+            }
+        }
+
+        // ==========================================
+        // FIN DEL VENDEDOR SILENCIOSO: PRODUCTOS RELACIONADOS
+        // ==========================================
+
+        // Ejecutamos la función pasándole la categoría del producto actual
+        if (datosProducto.categoria) {
+            cargarRelacionados(datosProducto.categoria, idProducto);
+        }
 
     // --- LÓGICA DEL LIGHTBOX (IMAGEN EXPANDIDA) ---
         const modal = document.getElementById("modal-imagen");
