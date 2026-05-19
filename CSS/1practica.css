@@ -1201,20 +1201,35 @@ body > :not(.footer):last-child {
 
 
 /* =========================================
-   VITRINA DE PRODUCTOS RELACIONADOS (CORREGIDA)
+   VITRINA DE PRODUCTOS RELACIONADOS (CORREGIDA SCROLL MÓVIL)
 ========================================= */
 #contenedor-relacionados {
     display: flex;
-   
-    gap: 30px; 
-    padding: 20px 0; /* Quitamos el padding lateral para ganar espacio */
-    justify-content: center; /* Centrado perfecto y absoluto garantizado */
+    flex-wrap: nowrap; /* Estricto: Obliga a que estén en una sola fila infinita */
+    gap: 15px; 
+    padding: 20px 10px; /* Un poco de margen a los lados para que no nazcan pegados al borde del celular */
+    overflow-x: auto; /* ESTA ES LA MAGIA: Activa el scroll horizontal */
+    -webkit-overflow-scrolling: touch; /* Deslizamiento suave con el dedo */
+    scroll-snap-type: x mandatory; /* Efecto imán al deslizar */
+    justify-content: flex-start; /* Reemplaza el center para que el scroll funcione desde el inicio */
+}
+
+/* Ocultar la barra gris de scroll abajo para que se vea como app nativa */
+#contenedor-relacionados::-webkit-scrollbar {
+    display: none;
+}
+#contenedor-relacionados {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 #contenedor-relacionados .tarjeta {
-    width: 250px; /* Tamaño fijo e idéntico para todas las tarjetas */
-    flex: 0 0 auto;
+    /* En celulares, hacemos que la tarjeta mida un 80% de la pantalla para dejar ver la siguiente */
+    width: 250px; 
+    max-width: 80vw; 
+    flex: 0 0 auto; /* Congela el tamaño para que no se aplasten */
     margin: 0; 
+    scroll-snap-align: center; /* Cuando sueltas el dedo, la tarjeta se centra sola */
 }
 
 /* Borramos la regla @media que pusimos antes, porque el flex-wrap hace 

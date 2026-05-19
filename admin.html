@@ -19,6 +19,21 @@
 </head>
 <body>
 
+    <div id="login-box" style="max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;">
+    <h2>🔒 Acceso Restringido - Skynet Smart</h2>
+    <input type="email" id="login-email" placeholder="Correo de Usuario" style="width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box;">
+    <input type="password" id="login-pass" placeholder="Contraseña" style="width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box;">
+    <button id="btn-login" style="width: 100%; padding: 10px; background: #111; color: #00cc66; border: none; font-weight: bold; cursor: pointer; font-size: 16px;">Iniciar Sesión</button>
+    <p id="login-error" style="color: red; margin-top: 15px; display: none; font-weight: bold;">❌ Credenciales incorrectas.</p>
+</div>
+
+<div id="admin-content" style="display: none;">
+    <div style="text-align: right; padding: 10px 50px;">
+        <button id="btn-logout" style="background: #dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; font-weight: bold; border-radius: 5px;">🚪 Cerrar Sesión</button>
+    </div>
+
+
+
 <div class="caja">
     <h2 style="text-align: center;">🚀 Subir Nuevo Producto</h2>
     
@@ -134,9 +149,13 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, writeBatch, doc, setDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js"
+    import { getFirestore, writeBatch, doc, setDoc, collection, query, where, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    // IMPORTACIÓN NUEVA PARA EL LOGIN
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDawRJ_UEd60LCwxD3Lk-eZsmMffpjWXlg",
@@ -150,6 +169,50 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app); // INICIALIZAR SEGURIDAD
+
+    // LÓGICA DE CONTROL DE ACCESO
+    const loginBox = document.getElementById('login-box');
+    const adminContent = document.getElementById('admin-content');
+    const btnLogin = document.getElementById('btn-login');
+
+    // Revisa si hay alguien autorizado
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            loginBox.style.display = 'none';
+            adminContent.style.display = 'block';
+        } else {
+            loginBox.style.display = 'block';
+            adminContent.style.display = 'none';
+        }
+    });
+
+    // Acción de Iniciar Sesión
+    btnLogin.addEventListener('click', async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-pass').value.trim();
+        const errorMsg = document.getElementById('login-error');
+        
+        if (!email || !pass) return;
+
+        btnLogin.innerText = "⏳ Verificando...";
+        btnLogin.disabled = true;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            errorMsg.style.display = 'none';
+        } catch (error) {
+            errorMsg.style.display = 'block';
+        } finally {
+            btnLogin.innerText = "Iniciar Sesión";
+            btnLogin.disabled = false;
+        }
+    });
+
+    // Acción de Cerrar Sesión
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        signOut(auth);
+    });
 
     // API Key de ImgBB
     const IMGBB_API_KEY = "c9251d2bf8bf4ffe2fd08ef08389d587"; 
