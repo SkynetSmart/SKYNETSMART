@@ -1201,20 +1201,25 @@ body > :not(.footer):last-child {
 
 
 /* =========================================
-   VITRINA DE PRODUCTOS RELACIONADOS (CORREGIDA SCROLL MÓVIL)
+   VITRINA DE PRODUCTOS RELACIONADOS (SCROLL FORZADO)
 ========================================= */
 #contenedor-relacionados {
-    display: flex;
-    flex-wrap: nowrap; /* Estricto: Obliga a que estén en una sola fila infinita */
-    gap: 15px; 
-    padding: 20px 10px; /* Un poco de margen a los lados para que no nazcan pegados al borde del celular */
-    overflow-x: auto; /* ESTA ES LA MAGIA: Activa el scroll horizontal */
-    -webkit-overflow-scrolling: touch; /* Deslizamiento suave con el dedo */
-    scroll-snap-type: x mandatory; /* Efecto imán al deslizar */
-    justify-content: flex-start; /* Reemplaza el center para que el scroll funcione desde el inicio */
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Prohíbe tajantemente múltiples líneas */
+    gap: 15px;
+    padding: 20px 15px;
+    overflow-x: auto !important; /* Fuerza la barra de desplazamiento */
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    justify-content: flex-start !important;
+    
+    /* EL FRENO DE EMERGENCIA PARA EL CONTENEDOR */
+    width: 100% !important; 
+    max-width: 100vw !important; 
+    box-sizing: border-box !important; 
 }
 
-/* Ocultar la barra gris de scroll abajo para que se vea como app nativa */
+/* Ocultar barra gris */
 #contenedor-relacionados::-webkit-scrollbar {
     display: none;
 }
@@ -1224,12 +1229,14 @@ body > :not(.footer):last-child {
 }
 
 #contenedor-relacionados .tarjeta {
-    /* En celulares, hacemos que la tarjeta mida un 80% de la pantalla para dejar ver la siguiente */
-    width: 250px; 
-    max-width: 80vw; 
-    flex: 0 0 auto; /* Congela el tamaño para que no se aplasten */
-    margin: 0; 
-    scroll-snap-align: center; /* Cuando sueltas el dedo, la tarjeta se centra sola */
+    /* EL FRENO DE EMERGENCIA PARA LAS TARJETAS */
+    width: 260px !important; 
+    min-width: 260px !important; /* Obliga a la tarjeta a mantener su tamaño original */
+    max-width: 260px !important;
+    flex: 0 0 260px !important; /* Le dice a Flexbox: "No me encojas ni me estires" */
+    
+    margin: 0;
+    scroll-snap-align: center;
 }
 
 /* Borramos la regla @media que pusimos antes, porque el flex-wrap hace 
