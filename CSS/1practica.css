@@ -149,7 +149,7 @@ body {
     }
 
     .imagen-esquina {
-        width: 200px; /* Tamaño aumentado para mayor presencia en celular */
+        width: 250px; /* Tamaño aumentado para mayor presencia en celular */
         max-width: 80vw; /* Freno de seguridad por si la pantalla es excesivamente pequeña */
     }
 
