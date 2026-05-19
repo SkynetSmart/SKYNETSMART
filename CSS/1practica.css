@@ -149,7 +149,8 @@ body {
     }
 
     .imagen-esquina {
-        width: 130px; /* Logo más pequeño en móvil */
+        width: 200px; /* Tamaño aumentado para mayor presencia en celular */
+        max-width: 80vw; /* Freno de seguridad por si la pantalla es excesivamente pequeña */
     }
 
     #buscar {
