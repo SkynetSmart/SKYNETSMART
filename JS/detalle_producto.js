@@ -29,10 +29,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+       let datosProducto = null;
         // 2. BUSCAR EN FIREBASE (Asumiendo que buscas por el campo codigo_caos o codigoInterno)
     try {
         const productosRef = collection(db, "productos");
-        let datosProducto = null;
+       
         
         // PLAN A: Buscamos como codigo_caos (Productos de CAOS)
         let q = query(productosRef, where("codigo_caos", "==", idProducto));
@@ -85,6 +86,43 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("prod-precio").textContent = `$${precioFormateado}`;
         
         document.getElementById("prod-descripcion").textContent = datosProducto.descripcion || "Sin descripción disponible.";
+
+    //    // --- MOTOR DE ADVERTENCIA DE STOCK INTELIGENTE (BLINDADO) ---
+    //     const contenedorAlerta = document.getElementById('contenedor-alerta-stock');
+
+    //     // ESCUDO: Solo ejecutamos la lógica si la caja realmente existe en el HTML
+    //     if (contenedorAlerta) {
+    //         // Extraemos los valores. Si el campo no existe en Firebase, forzamos a que sea 0.
+    //         const stockActual = Number(datosProducto.stock) || 0;
+    //         const precioActual = Number(datosProducto.precio) || 0;
+
+    //         // Lógica: Mostrar solo si hay entre 1 y 3 unidades Y el precio es >= $80
+    //         if (stockActual > 0 && stockActual <= 3 && precioActual >= 80) {
+    //             contenedorAlerta.classList.remove('alerta-oculta');
+    //         } else {
+    //             contenedorAlerta.classList.add('alerta-oculta');
+    //         }
+    //     }
+
+    // --- MOTOR DE ADVERTENCIA DE STOCK (BLINDADO Y CON DIAGNÓSTICO) ---
+        const contenedorAlerta = document.getElementById('contenedor-alerta-stock');
+        if (contenedorAlerta) {
+            const stockActual = Number(datosProducto.stock) || 0;
+            const precioActual = Number(datosProducto.precio) || 0;
+
+            // EL ESCÁNER: Esto imprimirá la verdad en tu consola F12
+            console.log("=== DIAGNÓSTICO DE ALERTA ===");
+            console.log("1. Stock crudo en Firebase:", datosProducto.stock, "-> Convertido a número:", stockActual);
+            console.log("2. Precio crudo en Firebase:", datosProducto.precio, "-> Convertido a número:", precioActual);
+
+            if (stockActual > 0 && stockActual <= 3 && precioActual >= 80) {
+                console.log("3. EVALUACIÓN: Cumple las reglas. ENCENDIENDO ALERTA.");
+                contenedorAlerta.classList.remove('alerta-oculta');
+            } else {
+                console.log("3. EVALUACIÓN: NO cumple las reglas (Falta stock, falta precio, o stock es 0). OCULTANDO.");
+                contenedorAlerta.classList.add('alerta-oculta');
+            }
+        }
 
         // Hacemos que la imagen real se vuelva visible
         const imagenPrincipal = document.getElementById("prod-imagen");
@@ -240,10 +278,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         // FIN DEL VENDEDOR SILENCIOSO: PRODUCTOS RELACIONADOS
         // ==========================================
 
-        // Ejecutamos la función pasándole la categoría del producto actual
-        if (datosProducto.categoria) {
-            cargarRelacionados(datosProducto.categoria, idProducto);
-        }
+      
 
     // --- LÓGICA DEL LIGHTBOX (IMAGEN EXPANDIDA) ---
         const modal = document.getElementById("modal-imagen");

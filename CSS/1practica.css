@@ -41,11 +41,28 @@ body {
     width: 100%;
     padding-bottom: 0;
 }
-/*imagen skynet*/
+/* --- LOGO SKYNET (TAMAÑO AUMENTADO) --- */
 .imagen-esquina {
-    width: 250px; /* Ajuste para que se vea bien en laptop */
+    width: 450px; /* Casi el doble del original (250px) para pantallas grandes */
     height: auto;
-    transition: width 0.3s;
+    transition: width 0.3s ease;
+}
+
+/* --- FRENOS DE EMERGENCIA RESPONSIVOS --- */
+
+/* Para Laptops pequeñas y Tablets */
+@media (max-width: 1024px) {
+    .imagen-esquina {
+        width: 320px; /* Se reduce un poco para no aplastar el buscador */
+    }
+}
+
+/* Para Celulares (Reemplaza la regla que ya tenías) */
+@media (max-width: 768px) {
+    .imagen-esquina {
+        width: 250px; /* Vuelve a un tamaño seguro */
+        max-width: 80vw; /* Freno absoluto: nunca será más ancho que el 80% del celular */
+    }
 }
 
 .redes-sociales {
@@ -403,11 +420,10 @@ img {
   right: 10px;
 }
 /* Layout base para que el footer se quede abajo sin tapar contenido */
+/* Layout base para que el footer se quede abajo sin tapar contenido */
 html, body {
   height: 100%;
   margin: 0;
-  /* --- LAS DOS REGLAS MÁGICAS --- */
-  
 }
 
 .footer {
@@ -415,27 +431,36 @@ html, body {
     background: #222;
     color: #fff;
     text-align: center;
-    padding: 5px 0; /* Unifica el espacio arriba y abajo */
+    /* Aumentamos el padding a 30px para que el fondo negro sea mucho más alto y respire */
+    padding: 30px 0; 
 }
 
 .footer article {
     display: flex;
-    justify-content: center; /* Centra los elementos */
+    justify-content: center;
     align-items: center;
-    gap: 50px; /* Espacio entre dirección, teléfono y correo */
-    flex-wrap: wrap; /* Por si se ve en celular, que no se amontone */
+    gap: 50px; 
+    flex-wrap: wrap; 
 }
 
 .footer p {
     color: #fff;
-    font-size: 10px;
-    margin: 10; /* ELIMINA el espacio que infla el footer */
+    /* Subimos la letra de 10px a 16px para que sea legible a simple vista */
+    font-size: 16px; 
+    /* Corregimos el error de sintaxis y le damos margen */
+    margin: 10px 0; 
     display: flex;
     align-items: center;
-    gap: 5px; /* Espacio entre el icono y el texto */
+    gap: 10px; 
 }
 
-/* Corrección de tu regla anterior */
+/* NUEVA REGLA: Obligamos a los iconos SVG a crecer proporcionalmente con la nueva letra */
+.footer p svg {
+    width: 25px;
+    height: 25px;
+}
+
+/* Corrección para que el último elemento antes del footer no empuje la página */
 body > :not(.footer):last-child {
     margin-bottom: 0;
 }
@@ -1242,3 +1267,32 @@ body > :not(.footer):last-child {
 
 /* Borramos la regla @media que pusimos antes, porque el flex-wrap hace 
    todo el trabajo responsivo automáticamente sin que tengamos que programarlo */
+
+   /* =========================================
+   ALERTA DE STOCK BAJO (INTELIGENTE)
+========================================= */
+.alerta-stock-bajo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff3cd; 
+    color: #856404; 
+    border: 1px solid #ffeeba;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    animation: palpitar-suave 2.5s infinite;
+}
+
+@keyframes palpitar-suave {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.alerta-oculta {
+    display: none !important;
+}
