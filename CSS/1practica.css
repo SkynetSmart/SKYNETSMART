@@ -41,28 +41,11 @@ body {
     width: 100%;
     padding-bottom: 0;
 }
-/* --- LOGO SKYNET (TAMAÑO AUMENTADO) --- */
+/*imagen skynet*/
 .imagen-esquina {
-    width: 450px; /* Casi el doble del original (250px) para pantallas grandes */
+    width: 450px; /* Ajuste para que se vea bien en laptop */
     height: auto;
-    transition: width 0.3s ease;
-}
-
-/* --- FRENOS DE EMERGENCIA RESPONSIVOS --- */
-
-/* Para Laptops pequeñas y Tablets */
-@media (max-width: 1024px) {
-    .imagen-esquina {
-        width: 320px; /* Se reduce un poco para no aplastar el buscador */
-    }
-}
-
-/* Para Celulares (Reemplaza la regla que ya tenías) */
-@media (max-width: 768px) {
-    .imagen-esquina {
-        width: 250px; /* Vuelve a un tamaño seguro */
-        max-width: 80vw; /* Freno absoluto: nunca será más ancho que el 80% del celular */
-    }
+    transition: width 0.3s;
 }
 
 .redes-sociales {
@@ -962,7 +945,8 @@ body > :not(.footer):last-child {
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 20px;
-    min-height: 70px; /* ESTO ES LA MAGIA: Obliga a que todos tengan la misma altura */
+    height: auto; /* Permite que el texto crezca lo que necesite sin cortarse */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8); /* Sombra para que se lea perfecto sobre cualquier foto */
 }
 
 .puntos-clave {
