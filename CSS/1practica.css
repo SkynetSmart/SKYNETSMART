@@ -941,12 +941,18 @@ body > :not(.footer):last-child {
 }
 
 .banner-contenido p {
-    color: #ccc;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    height: auto; /* Permite que el texto crezca lo que necesite sin cortarse */
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.8); /* Sombra para que se lea perfecto sobre cualquier foto */
+    color: #ccc !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 20px !important;
+    
+    /* El freno absoluto contra los cortes de texto */
+    height: auto !important; 
+    min-height: unset !important;
+    white-space: normal !important; 
+    
+    /* Pequeña sombra para que resalte contra las imágenes de fondo */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
 }
 
 .puntos-clave {
