@@ -914,6 +914,7 @@ body > :not(.footer):last-child {
     flex-direction: column;
     justify-content: flex-end;
     padding: 30px;
+    box-sizing: border-box; /* ESTA ES LA REGLA CRÍTICA QUE FALTABA */
     transition: background 0.3s;
 }
 
