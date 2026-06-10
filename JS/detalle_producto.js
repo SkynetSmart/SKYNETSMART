@@ -105,25 +105,33 @@ document.addEventListener("DOMContentLoaded", async () => {
     //     }
 
     // --- MOTOR DE ADVERTENCIA DE STOCK (BLINDADO Y CON DIAGNÓSTICO) ---
+        // --- MOTOR DE ADVERTENCIA DE STOCK CON ESCASEZ PSICOLÓGICA ---
         const contenedorAlerta = document.getElementById('contenedor-alerta-stock');
+        
         if (contenedorAlerta) {
-            const stockActual = Number(datosProducto.stock) || 0;
+            // Leemos el nuevo campo 'stock_real' que ahora nos enviará el admin.html
+            const stockActual = Number(datosProducto.stock_real) || 0;
             const precioActual = Number(datosProducto.precio) || 0;
 
-            // EL ESCÁNER: Esto imprimirá la verdad en tu consola F12
-            console.log("=== DIAGNÓSTICO DE ALERTA ===");
-            console.log("1. Stock crudo en Firebase:", datosProducto.stock, "-> Convertido a número:", stockActual);
-            console.log("2. Precio crudo en Firebase:", datosProducto.precio, "-> Convertido a número:", precioActual);
+            console.log("=== DIAGNÓSTICO DE URGENCIA ===");
+            console.log("Stock Real:", stockActual, " | Precio:", precioActual);
 
-            if (stockActual > 0 && stockActual <= 3 && precioActual >= 80) {
-                console.log("3. EVALUACIÓN: Cumple las reglas. ENCENDIENDO ALERTA.");
+            // Regla de marketing: Quedan 3 o menos, pero más de 0, Y el producto cuesta $75 o más.
+            if (stockActual > 0 && stockActual <= 3 && precioActual >= 75) {
+                console.log("Activando gatillo de ventas (FOMO).");
+                
+                // Buscamos el texto dentro de la alerta y lo reescribimos dinámicamente
+                const spanAlerta = contenedorAlerta.querySelector('.alerta-stock-bajo');
+                if (spanAlerta) {
+                    spanAlerta.innerHTML = `🔥 ¡Apresúrate! Solo quedan <strong>${stockActual}</strong> unidades disponibles.`;
+                }
+                
                 contenedorAlerta.classList.remove('alerta-oculta');
             } else {
-                console.log("3. EVALUACIÓN: NO cumple las reglas (Falta stock, falta precio, o stock es 0). OCULTANDO.");
+                console.log("No cumple criterios de urgencia exclusiva. Ocultando alerta.");
                 contenedorAlerta.classList.add('alerta-oculta');
             }
         }
-
         // Hacemos que la imagen real se vuelva visible
         const imagenPrincipal = document.getElementById("prod-imagen");
         imagenPrincipal.style.opacity = "1"; 

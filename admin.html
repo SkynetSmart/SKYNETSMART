@@ -79,6 +79,18 @@
     <h3 style="text-align: center;">🔄 Sincronizar Stock (Excel CAOS)</h3>
     <p style="font-size: 13px; color: #666; text-align: center;">Sube el Excel exportado de CAOS para actualizar stock y precios de forma automática.</p>
     
+    <!-- NUEVO INTERRUPTOR DE REDONDEO -->
+    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeeba; margin-bottom: 15px; text-align: center;">
+        <label style="cursor: pointer; font-weight: bold; color: #856404;">
+            <input type="checkbox" id="checkRedondeo" checked> 
+            ⚙️ Forzar redondeo de precios hacia arriba (Eliminar centavos)
+        </label>
+        <p style="font-size: 11px; color: #856404; margin-top: 5px; margin-bottom: 0;">
+            Si desmarcas esta casilla, los precios se guardarán con sus centavos originales.
+        </p>
+    </div>
+    <!-- FIN NUEVO INTERRUPTOR -->
+
     <input type="file" id="inputExcel" accept=".xlsx, .xls">
     <button id="btnSincronizar" style="background: #28a745;">Actualizar Inventario</button>
     <p id="estadoSincro" style="font-weight: bold; text-align: center; margin-top: 10px;"></p>
@@ -314,15 +326,27 @@
             const hoja = workbook.Sheets[workbook.SheetNames[0]];
             const inventarioCAOS = XLSX.utils.sheet_to_json(hoja);
             
-            // 2. CREAR DICCIONARIO RÁPIDO DE CAOS
-            // Extrae el Codigo, la Disponibilidad y el PVP de tu Excel
+            // 2. CREAR DICCIONARIO RÁPIDO DE CAOS Y APLICAR REDONDEO
             const mapaCAOS = {};
+            const aplicarRedondeo = document.getElementById('checkRedondeo').checked; // Captura la decisión del jefe
+
             inventarioCAOS.forEach(item => {
                 const cod = String(item.Codigo);
                 if (cod && cod !== "undefined") {
+                    
+                    let precioOriginal = parseFloat(item.PVP) || 0;
+                    let precioFinal;
+
+                    // El filtro de precios
+                    if (aplicarRedondeo && precioOriginal > 0) {
+                        precioFinal = Math.ceil(precioOriginal); // Sube al entero superior (ej. 1.15 se vuelve 2)
+                    } else {
+                        precioFinal = parseFloat(precioOriginal.toFixed(2)); // Mantiene exactos los centavos
+                    }
+
                     mapaCAOS[cod] = {
                         stock: parseFloat(item.Disponibilidad) || 0,
-                        precio: parseFloat(item.PVP) || 0
+                        precio: precioFinal
                     };
                 }
             });
@@ -353,7 +377,8 @@
 
                     batch.update(docSnap.ref, {
                         precio: nuevoPrecio,
-                        agotado: estaAgotado
+                        agotado: estaAgotado,
+                        stock_real: datosHoy.stock // INYECCIÓN DEL STOCK EXACTO
                     });
                     
                     actualizados++;
