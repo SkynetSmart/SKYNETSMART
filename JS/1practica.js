@@ -547,10 +547,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Aquí pones las rutas exactas de tus dos (o más) videos
     const listaVideos = [
+        "IMAGENES/imagenes publicidad/tecladomsi.mp4",
+        "IMAGENES/imagenes publicidad/hpvideo.mp4",
         "IMAGENES/imagenes publicidad/publicidadvideolaptopopen.mp4",
         "IMAGENES/imagenes publicidad/publicidadvideocelulares.mp4",
-        "IMAGENES/imagenes publicidad/Download.mp4", 
-        "IMAGENES/imagenes publicidad/publicidadosmo.mp4" // 
+        
+        
     ];
     
     let indiceActual = 0;

@@ -285,8 +285,9 @@
                 categoria: inputCatPrincipal,
                 subcategoria: inputSubCategoria,
                 imagen: link1,
-                imagen2: link2 || link1, // Si no hay foto 2, duplica la 1 para evitar errores visuales
-                agotado: esAgotado 
+                imagen2: link2 || link1,
+                agotado: esAgotado,
+                stock_real: 0 // Nace en 0 por seguridad hasta la próxima sincronización con Excel
             });
 
             alert("✅ ¡Producto guardado con éxito!");

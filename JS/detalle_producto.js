@@ -120,10 +120,14 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (stockActual > 0 && stockActual <= 3 && precioActual >= 75) {
                 console.log("Activando gatillo de ventas (FOMO).");
                 
-                // Buscamos el texto dentro de la alerta y lo reescribimos dinámicamente
                 const spanAlerta = contenedorAlerta.querySelector('.alerta-stock-bajo');
                 if (spanAlerta) {
-                    spanAlerta.innerHTML = `🔥 ¡Apresúrate! Solo quedan <strong>${stockActual}</strong> unidades disponibles.`;
+                    // Validación gramatical
+                    if (stockActual === 1) {
+                        spanAlerta.innerHTML = `🔥 ¡Apresúrate! Solo queda <strong>1</strong> unidad disponible.`;
+                    } else {
+                        spanAlerta.innerHTML = `🔥 ¡Apresúrate! Solo quedan <strong>${stockActual}</strong> unidades disponibles.`;
+                    }
                 }
                 
                 contenedorAlerta.classList.remove('alerta-oculta');

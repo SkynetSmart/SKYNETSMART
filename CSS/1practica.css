@@ -293,13 +293,12 @@ img {
   width: 100%;
   max-width: 250px;
   height: 200px;
-  object-fit: contain  !important;
-  object-fit: cover;
+  object-fit: contain !important; /* Eliminamos el comando 'cover' que estaba causando conflicto */
   display: block;
   border-radius: 5px;
   margin: 0 auto;
   cursor: pointer;
-  }
+}
 .masinformacion{
   color:rgb(31, 3, 91);
 }
@@ -1012,11 +1011,20 @@ body > :not(.footer):last-child {
     padding: 20px;
 }
 
+/* CRÍTICO: Definimos la caja contenedora como un bloque rígido para que la foto no la aplaste ni la encoja */
+.caja-imagen-principal {
+    width: 100%;
+    height: 350px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .caja-imagen-principal img {
     width: 100%;
+    height: 100%;
     max-width: 400px;
-    height: auto;
-    object-fit: contain;
+    object-fit: contain; /* Ajusta la foto sin deformarla y rellena los espacios vacíos */
 }
 
 /* Lado Derecho: Info */
@@ -1132,6 +1140,7 @@ body > :not(.footer):last-child {
     transition: all 0.3s ease;
     padding: 5px;
     background-color: white;
+    box-sizing: border-box; /* CRÍTICO: Obliga al navegador a incluir el padding dentro de los 80px sin deformar la foto */
 }
 
 /* Efecto al pasar el mouse y al estar seleccionada */
