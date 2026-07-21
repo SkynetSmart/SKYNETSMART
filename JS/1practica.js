@@ -7,7 +7,7 @@
 
   // Script para la seccion oculta
   
-    function mostrarSeccion(id) {
+    /*function mostrarSeccion(id) {
       // Ocultar todas las secciones
       const secciones = document.querySelectorAll('.seccion-oculta, .seccion-visible');
       secciones.forEach(seccion => seccion.classList.remove('seccion-visible'));
@@ -17,7 +17,7 @@
       if (activa) {
         activa.classList.add('seccion-visible');
       }
-    }
+    }*/
   
  //buscador
  const inputBuscar = document.getElementById('buscar');
