@@ -339,17 +339,16 @@
                     let precioFinal;
 
                     // El filtro de precios
-                        if (aplicarRedondeo && precioOriginal > 0) {
-                            // 1. Primero limpiamos las milésimas fantasma de CAOS (ej. 75.0022 se vuelve 75.00)
-                            let precioLimpio = parseFloat(precioOriginal.toFixed(2));
-    
-                            // 2. Luego aplicamos el redondeo. Si quedó en 75.00 exacto, NO lo subirá a 76.
-                            precioFinal = Math.ceil(precioLimpio); 
-                        } else {
-                            // Si el jefe pide dejar los centavos, se mantienen exactos a 2 decimales
-                            precioFinal = parseFloat(precioOriginal.toFixed(2)); 
-                        }
-
+                    if (aplicarRedondeo && precioOriginal > 0) {
+                        // 1. Limpiamos las milésimas de CAOS (ej. 999.0032 se vuelve 999.00)
+                        let precioLimpio = parseFloat(precioOriginal.toFixed(2));
+                        
+                        // 2. Aplicamos el redondeo. Si quedó en 999.00, se queda en 999.
+                        precioFinal = Math.ceil(precioLimpio); 
+                    } else {
+                        // Si el jefe pide dejar los centavos, se mantienen exactos a 2 decimales
+                        precioFinal = parseFloat(precioOriginal.toFixed(2)); 
+                    }
                     mapaCAOS[cod] = {
                         stock: parseFloat(item.Disponibilidad) || 0,
                         precio: precioFinal
