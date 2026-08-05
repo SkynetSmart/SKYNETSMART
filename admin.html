@@ -64,7 +64,10 @@
         <option value="varios">Varios</option>
     </select>
 
-    <input type="text" id="subCategoria" placeholder="Escribe la subcategoría (Ej. Teclados)">
+    <!-- Subcategoría Dinámica -->
+<select id="subCategoria" disabled>
+    <option value="" disabled selected>Primero selecciona una Categoría Principal...</option>
+</select>
     
     <label class="etiqueta-foto">📸 Foto Principal (Máx 500KB):</label>
     <input type="file" id="fotoProducto1" accept="image/*">
@@ -225,6 +228,64 @@
     document.getElementById('btn-logout').addEventListener('click', () => {
         signOut(auth);
     });
+
+    // =================================================================
+// MOTOR DE SUBCATEGORÍAS DINÁMICAS
+// =================================================================
+
+// 1. Definimos las listas exactas según tu estándar
+const mapaSubcategorias = {
+    perifericos: [
+        { valor: "monitores", texto: "Monitores" },
+        { valor: "teclados", texto: "Teclados" },
+        { valor: "mouses", texto: "Mouses" },
+        { valor: "camaras", texto: "Cámaras" },
+        { valor: "audio-domotica", texto: "Audio" },
+        { valor: "almacenamiento-extra", texto: "Almacenamiento Extra (Flash/MicroSD)" },
+        { valor: "accesorios-varios", texto: "Accesorios Varios" }
+    ],
+    componentes: [
+        { valor: "mainboard", texto: "Mainboard" },
+        { valor: "almacenamiento", texto: "Almacenamiento (HDD/SSD/M.2)" },
+        { valor: "procesador", texto: "Procesador" },
+        { valor: "tarjetavideo", texto: "Tarjeta de Video" },
+        { valor: "ram", texto: "Memoria RAM" },
+        { valor: "case", texto: "Case / Gabinete" },
+        { valor: "fuente", texto: "Fuente de Poder" },
+        { valor: "refrigeracion", texto: "Refrigeración / Coolers" }
+    ],
+    suministros: [
+        { valor: "Tinta", texto: "Tinta" },
+        { valor: "Laser", texto: "Láser (Tóner)" },
+        { valor: "Termico", texto: "Térmico (Rollos/Etiquetas)" },
+        { valor: "Matricial", texto: "Matricial (Cintas/Ribbons)" }
+    ]
+};
+
+// 2. Escuchamos cuando se cambia la categoría principal
+document.getElementById('categoriaPrincipal').addEventListener('change', function() {
+    const categoriaElegida = this.value;
+    const selectSub = document.getElementById('subCategoria');
+    
+    // Limpiamos el menú secundario
+    selectSub.innerHTML = '<option value="" disabled selected>Selecciona Subcategoría...</option>';
+    
+    // Si la categoría existe en nuestro mapa, llenamos la lista
+    if (mapaSubcategorias[categoriaElegida]) {
+        mapaSubcategorias[categoriaElegida].forEach(sub => {
+            const opcion = document.createElement('option');
+            opcion.value = sub.valor;   // El ID limpio para Firebase
+            opcion.textContent = sub.texto; // El texto bonito para leer
+            selectSub.appendChild(opcion);
+        });
+        selectSub.disabled = false; // Desbloqueamos el selector
+    } else {
+        // Para categorías que aún no tienen submenú (ej. Laptops, Celulares)
+        // Lo convertimos en un campo libre temporal, o le ponemos un valor general.
+        selectSub.innerHTML = '<option value="general" selected>General</option>';
+        selectSub.disabled = false;
+    }
+});
 
     // API Key de ImgBB
     const IMGBB_API_KEY = "c9251d2bf8bf4ffe2fd08ef08389d587"; 
