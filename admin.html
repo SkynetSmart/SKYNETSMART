@@ -399,16 +399,23 @@ document.getElementById('categoriaPrincipal').addEventListener('change', functio
                     let precioOriginal = parseFloat(item.PVP) || 0;
                     let precioFinal;
 
+                    // Analizamos el precio como TEXTO (4 decimales) para no depender
+                    // de redondeos matemáticos que fallan con números como 999.0067.
+                    // Los primeros 2 decimales = céntimos reales. Los últimos 2 = "código"
+                    // que pone la compañera para indicar "sin céntimos" y SIEMPRE se ignoran.
+                    const partesPrecio = precioOriginal.toFixed(4).split('.');
+                    const parteEntera = parseInt(partesPrecio[0], 10);
+                    const centavosReales = parseInt(partesPrecio[1].substring(0, 2), 10);
+
                     // El filtro de precios
                     if (aplicarRedondeo && precioOriginal > 0) {
-                        // 1. Limpiamos las milésimas de CAOS (ej. 999.0032 se vuelve 999.00)
-                        let precioLimpio = parseFloat(precioOriginal.toFixed(2));
-                        
-                        // 2. Aplicamos el redondeo. Si quedó en 999.00, se queda en 999.
-                        precioFinal = Math.ceil(precioLimpio); 
+                        // Si no hay céntimos reales, se queda en el entero.
+                        // Si hay céntimos reales (aunque sea 1), sube al dólar/entero siguiente.
+                        precioFinal = centavosReales === 0 ? parteEntera : parteEntera + 1;
                     } else {
-                        // Si el jefe pide dejar los centavos, se mantienen exactos a 2 decimales
-                        precioFinal = parseFloat(precioOriginal.toFixed(2)); 
+                        // Si el jefe pide dejar los centavos, se mantienen los céntimos REALES
+                        // (se descarta igual el "código" de los últimos 2 decimales)
+                        precioFinal = parseFloat(`${parteEntera}.${String(centavosReales).padStart(2, '0')}`);
                     }
                     mapaCAOS[cod] = {
                         stock: parseFloat(item.Disponibilidad) || 0,
