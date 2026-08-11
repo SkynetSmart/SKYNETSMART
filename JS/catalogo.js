@@ -233,6 +233,29 @@ document.addEventListener('DOMContentLoaded', () => {
         'btnCompRefrigeracion': "refrigeracion"
     };
 
+    const botonesAccesorios = {
+        'btnAccTodo': "todo",
+        'btnAccCargadores': "cargadores-cables",
+        'btnAccCables': "cables-adaptadores",
+        'btnAccHubs': "hubs-multipuertos",
+        'btnAccFundas': "fundas-mochilas",
+        'btnAccAlmacenamiento': "almacenamiento-externo",
+        'btnAccRepuestos': "repuestos-laptop",
+        'btnAccOtros': "otros-accesorios"
+    };
+
+    const botonesVarios = {
+        'btnVarTodo': "todo",
+        'btnVarBiometricos': "biometricos-seguridad",
+        'btnVarPuntoVenta': "punto-venta",
+        'btnVarVideo': "video-streaming",
+        'btnVarTelefonia': "telefonia",
+        'btnVarSoportes': "soportes",
+        'btnVarLimpieza': "limpieza-repuestos",
+        'btnVarWearables': "wearables",
+        'btnVarOtros': "otros-varios"
+    };
+
     // ACTIVADORES DE BOTONES SEGUROS
     Object.keys(botones).forEach(id => {
         const boton = document.getElementById(id);
@@ -262,6 +285,30 @@ document.addEventListener('DOMContentLoaded', () => {
             boton.addEventListener('click', function() {
                 cargarProductos("perifericos", botonesPerifericos[id]);
                 activarBotonMenu(this); 
+            });
+        }
+    });
+
+    Object.keys(botonesAccesorios).forEach(id => {
+        const boton = document.getElementById(id);
+        if (boton) {
+            boton.addEventListener('click', function() {
+                cargarProductos("accesorios", botonesAccesorios[id]);
+                const botonesPildora = this.parentElement.querySelectorAll('.btn-pildora');
+                botonesPildora.forEach(b => b.classList.remove('activo'));
+                this.classList.add('activo');
+            });
+        }
+    });
+
+    Object.keys(botonesVarios).forEach(id => {
+        const boton = document.getElementById(id);
+        if (boton) {
+            boton.addEventListener('click', function() {
+                cargarProductos("varios", botonesVarios[id]);
+                const botonesPildora = this.parentElement.querySelectorAll('.btn-pildora');
+                botonesPildora.forEach(b => b.classList.remove('activo'));
+                this.classList.add('activo');
             });
         }
     });
