@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // Inyectamos los textos reales
         document.getElementById("prod-titulo").textContent = datosProducto.titulo || "Producto sin título";
+        document.title = `${datosProducto.titulo || "Producto"} - Skynet Smart`;
         document.getElementById("prod-codigo").textContent = idProducto;
         
         const precioFormateado = datosProducto.precio ? Number(datosProducto.precio).toFixed(2) : "0.00";
